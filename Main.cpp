@@ -82,6 +82,8 @@ int main()
 		glfwSwapBuffers(window);
 	}
 
+	delete scene;
+
 	std::cout << "Window closed" << std::endl;
 	glfwTerminate();
 

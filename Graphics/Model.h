@@ -12,9 +12,11 @@ namespace Graphics
 	public:
 		Model(const std::vector<glm::vec3>& vertices, const std::vector<int>& indices);
 
-		~Model();
+		virtual ~Model();
 
 		void Render();
+
+		void SetPrimitive(GLenum type);
 
 		void FillVertexBuffer(GLfloat* pBuffer);
 
@@ -29,11 +31,11 @@ namespace Graphics
 	protected:
 		GLenum primType;
 
-	private:
 		std::vector<glm::vec3> vertices;
 
 		std::vector<int> indices;
 
+	private:
 		GLuint vaoID;
 
 		GLuint vboVerticesID;

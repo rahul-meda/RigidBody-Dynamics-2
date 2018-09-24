@@ -41,6 +41,8 @@ namespace Demo
 	public:
 		Simulation();
 
+		~Simulation();
+
 		virtual void OnInit(GLFWwindow* window);
 
 		void OnWindowResize(GLFWwindow* window, int width, int height);
