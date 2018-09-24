@@ -87,7 +87,7 @@ namespace Graphics
 		if (glm::value_ptr(MVP) != 0)
 			glUniformMatrix4fv(shader.GetUniformLoc("MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
 		glBindVertexArray(vaoID);
-		glLineWidth(LINE_WIDTH);
+		//glLineWidth(LINE_WIDTH);
 		glPointSize(POINT_SIZE);
 		glDrawElements(primType, indices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);

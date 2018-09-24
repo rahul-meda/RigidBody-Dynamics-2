@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Model.h"
-#include <glm/glm.hpp>
 #include <vector>
 
 namespace Graphics

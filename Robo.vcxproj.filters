@@ -19,6 +19,9 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Simulation.h" />
+    <ClInclude Include="Graphics\Line.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
