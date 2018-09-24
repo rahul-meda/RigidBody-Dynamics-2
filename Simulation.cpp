@@ -74,6 +74,7 @@ namespace Demo
 		*id++ = 2; 	*id++ = 5; 	*id++ = 1;
 
 		cube = new Graphics::Poly(vertices, indices);
+		static_cast<Poly*>(cube)->SetFrame();
 		floor = new Graphics::Poly(vertices, indices);
 		floor->SetColor(glm::vec3(0.2,0.2,0.7));
 	}
@@ -178,6 +179,11 @@ namespace Demo
 		glm::mat4 MVP = P * V * M;
 		cube->SetMVP(MVP);
 		cube->Render();
+		Poly* frame = static_cast<Poly*>(cube)->GetFrame();
+		frame->SetMVP(MVP);
+		frame->Render();
+
+		frame = nullptr;
 
 		T = glm::translate(glm::vec3(0,-1.0,0));
 		S = glm::scale(glm::vec3(10.0,1.0,10.0));
@@ -217,5 +223,11 @@ namespace Demo
 			pitch -= MOUSE_SENSITIVITY;
 			Camera::GetInstance().Rotate(yaw, pitch, 0);
 		}
+	}
+
+	Simulation::~Simulation()
+	{
+		delete cube;
+		delete floor;
 	}
 }
