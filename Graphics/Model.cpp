@@ -96,7 +96,10 @@ namespace Graphics
 
 	void Model::SetColor(const glm::vec3 color)
 	{
+		shader.Use();
 		this->color = color;
+		glUniform3fv(shader.GetUniformLoc("vColor"), 1, glm::value_ptr(color));
+		shader.UnUse();
 	}
 
 	void Model::SetMVP(const glm::mat4& MVP)

@@ -15,9 +15,16 @@ namespace Demo
 		int width;
 		int height;
 
+		// camera transformation
+		float yaw;
+		float pitch;
+
 		// mouse co-ordinates
 		float mouseX;
 		float mouseY;
+
+		// for panning the scene on corner scroll
+		bool panLeft, panRight, panTop, panBot;
 
 		// to check for first mouse callback
 		bool firstMouseCB;
@@ -29,6 +36,7 @@ namespace Demo
 		bool debugDraw;
 
 		Graphics::Model* cube;
+		Graphics::Model* floor;
 
 	public:
 		Simulation();
