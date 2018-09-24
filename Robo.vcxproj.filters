@@ -19,6 +19,9 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Simulation.h" />
+    <ClInclude Include="Graphics\Camera.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
@@ -33,5 +36,8 @@
     </ClCompile>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Simulation.cpp" />
+    <ClCompile Include="Graphics\Camera.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
