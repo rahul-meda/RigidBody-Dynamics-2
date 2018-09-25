@@ -4,7 +4,7 @@
 #include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "Model.h"
+#include "Body.h"
 
 namespace Demo
 {
@@ -35,8 +35,13 @@ namespace Demo
 		// toggle drawing wire-frame mode
 		bool debugDraw;
 
-		Graphics::Model* cube;
-		Graphics::Model* floor;
+		bool pauseStep;
+		bool advanceStep;
+
+		Physics::Body box;
+		Physics::Body floor;
+
+		Graphics::Model* boxModel;
 
 	public:
 		Simulation();
@@ -54,6 +59,8 @@ namespace Demo
 		void OnMouseButton(GLFWwindow* window, int button, int action, int mods);
 
 		virtual void OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods);
+
+		void Step(const float dt);
 
 		virtual void Update();
 	};

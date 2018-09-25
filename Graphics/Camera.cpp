@@ -108,7 +108,7 @@ namespace Graphics
 	void Camera::Update(glm::vec3 t)
 	{
 		// camera z-axis
-		look = glm::normalize(glm::vec3(R*glm::vec4(0, 0, 1, 0)));
+		look = glm::normalize(glm::vec3(R*glm::vec4(0, 0, -1, 0)));
 
 		// camera y-axis
 		up = glm::normalize(glm::vec3(R*glm::vec4(0, 1, 0, 0)));

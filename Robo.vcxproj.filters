@@ -4,6 +4,9 @@
     <Filter Include="Graphics">
       <UniqueIdentifier>{6963ad77-0edd-4dfe-a8ee-264fb0a22fdc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{07d3b3ee-24a6-4117-a199-e9ab544eba77}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\stb_image.h">
@@ -25,6 +28,9 @@
     <ClInclude Include="Graphics\Line.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Physics\Body.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
@@ -41,6 +47,9 @@
     <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="Graphics\Camera.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Body.cpp">
+      <Filter>Physics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
