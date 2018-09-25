@@ -41,12 +41,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\Projects\Robo\Math;D:\Projects\Robo\Graphics;D:\Projects\Robo\Graphics\Include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Projects\Robo\Physics;D:\Projects\Robo\Math;D:\Projects\Robo\Graphics;D:\Projects\Robo\Graphics\Include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Projects\Robo\Graphics\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\Projects\Robo\Math;D:\Projects\Robo\Graphics;D:\Projects\Robo\Graphics\Include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Projects\Robo\Physics;D:\Projects\Robo\Math;D:\Projects\Robo\Graphics;D:\Projects\Robo\Graphics\Include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Projects\Robo\Graphics\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -90,6 +90,7 @@
     <ClInclude Include="Graphics\Poly.h" />
     <ClInclude Include="Graphics\Shader.h" />
     <ClInclude Include="Graphics\stb_image.h" />
+    <ClInclude Include="Physics\Body.h" />
     <ClInclude Include="Simulation.h" />
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +100,7 @@
     <ClCompile Include="Graphics\Shader.cpp" />
     <ClCompile Include="Graphics\stb_image.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Physics\Body.cpp" />
     <ClCompile Include="Simulation.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

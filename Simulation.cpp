@@ -6,6 +6,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include "Camera.h"
+#include <memory>
 
 using namespace Graphics;
 
@@ -14,7 +15,7 @@ using namespace Graphics;
 namespace Demo
 {
 	Simulation::Simulation()
-		:debugDraw(false), firstMouseCB(false)
+		:debugDraw(false), firstMouseCB(false), pauseStep(true), advanceStep(false)
 	{
 		panLeft = panRight = panBot = panTop = false;
 	}
@@ -73,10 +74,16 @@ namespace Demo
 		*id++ = 6; 	*id++ = 5; 	*id++ = 2;
 		*id++ = 2; 	*id++ = 5; 	*id++ = 1;
 
-		cube = new Graphics::Poly(vertices, indices);
-		static_cast<Poly*>(cube)->SetFrame();
-		floor = new Graphics::Poly(vertices, indices);
-		floor->SetColor(glm::vec3(0.2,0.2,0.7));
+		boxModel = new Graphics::Poly(vertices, indices);
+		static_cast<Graphics::Poly*>(boxModel)->SetFrame();
+		
+		box.SetModel(boxModel);
+		box.SetPosition(glm::vec3(0,2.0,0));
+		box.SetVelocity(glm::vec3(1.0,0,0));
+		box.SetMass(1.0f);
+
+		floor.SetModel(boxModel);
+		floor.SetPosition(glm::vec3(0));
 	}
 
 	void Simulation::OnWindowResize(GLFWwindow* window, int width, int height)
@@ -98,7 +105,8 @@ namespace Demo
 		}
 
 		float dx = mouseX - x;
-		float dy = y - mouseY;
+		float dy = mouseY - y;
+
 		mouseX = x;
 		mouseY = y;
 
@@ -119,6 +127,8 @@ namespace Demo
 
 		if (pitch > 89.0f) pitch = 89.0f;
 		if (pitch < -89.0f) pitch = -89.0f;
+		if (yaw > 89.0f) yaw = 89.0f;
+		if (yaw < -89.0f) yaw = -89.0f;
 
 		Camera::GetInstance().Rotate(yaw, pitch, 0);
 	}
@@ -160,6 +170,17 @@ namespace Demo
 			Camera::GetInstance().Move(Camera::GetInstance().GetCamY());
 		if (keys[GLFW_KEY_Z])
 			Camera::GetInstance().Move(-Camera::GetInstance().GetCamY());
+
+		if (keys[GLFW_KEY_P])
+			pauseStep = !pauseStep;
+		if (keys[GLFW_KEY_N])
+			advanceStep = true;
+	}
+
+	void Simulation::Step(const float dt)
+	{
+		box.Update(dt);
+		floor.Update(dt);
 	}
 
 	void Simulation::Update()
@@ -167,30 +188,45 @@ namespace Demo
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Physics Update
+		const static float dt = 1.0f / 60.0f;
+		
+		if (!pauseStep)
+			Step(dt);
+		else
+		{
+			if (advanceStep)
+			{
+				Step(dt);
+				advanceStep = false;
+			}
+		}
 
 		// Graphics update
 		glm::mat4 T(1), R(1), S(1), M(1);
 		glm::mat4 V = Camera::GetInstance().GetViewMatrix();
 		glm::mat4 P = Camera::GetInstance().GetProjectionMatrix();
-		T = glm::translate(glm::vec3(0,0,0));
-		R = glm::toMat4(glm::quat(0.0, glm::vec3(0,0,1)));
+		T = glm::translate(box.GetPosition());
+		R = glm::toMat4(box.GetOrientation());
 		S = glm::scale(glm::vec3(1.0));
 		M = T * R * S;
 		glm::mat4 MVP = P * V * M;
-		cube->SetMVP(MVP);
-		cube->Render();
-		Poly* frame = static_cast<Poly*>(cube)->GetFrame();
+		box.GetModel()->SetMVP(MVP);
+		box.GetModel()->SetColor(glm::vec3(0.3, 0.9, 0.3));
+		box.GetModel()->Render();
+		Poly* frame = static_cast<Poly*>(box.GetModel())->GetFrame();
 		frame->SetMVP(MVP);
 		frame->Render();
 
-		frame = nullptr;
-
-		T = glm::translate(glm::vec3(0,-1.0,0));
+		T = glm::translate(floor.GetPosition());
+		R = glm::toMat4(floor.GetOrientation());
 		S = glm::scale(glm::vec3(10.0,1.0,10.0));
 		M = T * R * S;
 		MVP = P * V * M;
-		floor->SetMVP(MVP);
-		floor->Render();
+		floor.GetModel()->SetMVP(MVP);
+		floor.GetModel()->SetColor(glm::vec3(0.7,0.7,0.9));
+		floor.GetModel()->Render();
+		frame->SetMVP(MVP);
+		frame->Render();
 
 		// Debug Draw
 		if (debugDraw)
@@ -227,7 +263,6 @@ namespace Demo
 
 	Simulation::~Simulation()
 	{
-		delete cube;
-		delete floor;
+		delete boxModel;
 	}
 }
