@@ -3,33 +3,33 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
-#include "Simulation.h"
+#include "Simulation/Simulations.h"
 
-Demo::Simulation* scene = new Demo::Simulation();
+Simulation::Simulation* sim = &Simulation::ParserTest::GetInstance();
 
 void OnWindowResize(GLFWwindow* window, int width, int height)
 {
-	scene->OnWindowResize(window, width, height);
+	sim->OnWindowResize(window, width, height);
 }
 
 void OnMouseMove(GLFWwindow* window, double x, double y)
 {
-	scene->OnMouseMove(window, x, y);
+	sim->OnMouseMove(window, x, y);
 }
 
 void OnMouseScroll(GLFWwindow* window, double dx, double dy)
 {
-	scene->OnMouseScroll(window, dx, dy);
+	sim->OnMouseScroll(window, dx, dy);
 }
 
 void OnMouseButton(GLFWwindow* window, int button, int action, int mods)
 {
-	scene->OnMouseButton(window, button, action, mods);
+	sim->OnMouseButton(window, button, action, mods);
 }
 
 void OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods)
 {
-	scene->OnKeyInput(window, key, code, action, mods);
+	sim->OnKeyInput(window, key, code, action, mods);
 }
 
 int main()
@@ -61,7 +61,7 @@ int main()
 		return -1;
 	}
 
-	scene->OnInit(window);
+	sim->OnInit(window);
 
 	glfwSetWindowSizeCallback(window, OnWindowResize);
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -77,12 +77,10 @@ int main()
 		glfwPollEvents();
 
 		// Update Systems
-		scene->Update();
+		sim->Update();
 
 		glfwSwapBuffers(window);
 	}
-
-	delete scene;
 
 	std::cout << "Window closed" << std::endl;
 	glfwTerminate();

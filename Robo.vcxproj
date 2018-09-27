@@ -41,12 +41,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\Projects\Robo\Physics;D:\Projects\Robo\Math;D:\Projects\Robo\Graphics;D:\Projects\Robo\Graphics\Include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Projects\Robo\Geometry;D:\Projects\Robo\Physics;D:\Projects\Robo\Math;D:\Projects\Robo\Graphics;D:\Projects\Robo\Graphics\Include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Projects\Robo\Graphics\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\Projects\Robo\Physics;D:\Projects\Robo\Math;D:\Projects\Robo\Graphics;D:\Projects\Robo\Graphics\Include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Projects\Robo\Geometry;D:\Projects\Robo\Physics;D:\Projects\Robo\Math;D:\Projects\Robo\Graphics;D:\Projects\Robo\Graphics\Include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Projects\Robo\Graphics\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -55,7 +55,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -72,7 +72,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -84,6 +84,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Geometry\Mesh.h" />
+    <ClInclude Include="Geometry\ObjParser.h" />
     <ClInclude Include="Graphics\Camera.h" />
     <ClInclude Include="Graphics\Line.h" />
     <ClInclude Include="Graphics\Model.h" />
@@ -91,9 +93,12 @@
     <ClInclude Include="Graphics\Shader.h" />
     <ClInclude Include="Graphics\stb_image.h" />
     <ClInclude Include="Physics\Body.h" />
-    <ClInclude Include="Simulation.h" />
+    <ClInclude Include="Simulation\ParserTest.h" />
+    <ClInclude Include="Simulation\Simulation.h" />
+    <ClInclude Include="Simulation\Simulations.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Geometry\ObjParser.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Graphics\Camera.cpp" />
     <ClCompile Include="Graphics\Model.cpp" />
@@ -101,7 +106,8 @@
     <ClCompile Include="Graphics\stb_image.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Physics\Body.cpp" />
-    <ClCompile Include="Simulation.cpp" />
+    <ClCompile Include="Simulation\ParserTest.cpp" />
+    <ClCompile Include="Simulation\Simulation.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

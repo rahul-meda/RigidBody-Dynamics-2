@@ -12,7 +12,7 @@ using namespace Graphics;
 
 #define MOUSE_SENSITIVITY 0.1
 
-namespace Demo
+namespace Simulation
 {
 	Simulation::Simulation()
 		:debugDraw(false), firstMouseCB(false), pauseStep(true), advanceStep(false)
@@ -36,54 +36,6 @@ namespace Demo
 		Graphics::Camera::GetInstance().SetProjection(45.0f, (float)width / (float)height);
 
 		Graphics::Camera::GetInstance().SetPosition(glm::vec3(0,1,0));
-
-		std::vector<glm::vec3> vertices(8);
-		std::vector<int> indices(36);
-
-		vertices[0] = glm::vec3(-0.5f, -0.5f, -0.5f);
-		vertices[1] = glm::vec3(0.5f, -0.5f, -0.5f);
-		vertices[2] = glm::vec3(0.5f, 0.5f, -0.5f);
-		vertices[3] = glm::vec3(-0.5f, 0.5f, -0.5f);
-		vertices[4] = glm::vec3(-0.5f, -0.5f, 0.5f);
-		vertices[5] = glm::vec3(0.5f, -0.5f, 0.5f);
-		vertices[6] = glm::vec3(0.5f, 0.5f, 0.5f);
-		vertices[7] = glm::vec3(-0.5f, 0.5f, 0.5f);
-
-		int* id = &indices[0];
-		//bottom face
-		*id++ = 0; 	*id++ = 5; 	*id++ = 4;
-		*id++ = 5; 	*id++ = 0; 	*id++ = 1;
-
-		//top face
-		*id++ = 3; 	*id++ = 7; 	*id++ = 6;
-		*id++ = 3; 	*id++ = 6; 	*id++ = 2;
-
-		//front face
-		*id++ = 7; 	*id++ = 4; 	*id++ = 6;
-		*id++ = 6; 	*id++ = 4; 	*id++ = 5;
-
-		//back face
-		*id++ = 2; 	*id++ = 1; 	*id++ = 3;
-		*id++ = 3; 	*id++ = 1; 	*id++ = 0;
-
-		//left face 
-		*id++ = 3; 	*id++ = 0; 	*id++ = 7;
-		*id++ = 7; 	*id++ = 0; 	*id++ = 4;
-
-		//right face 
-		*id++ = 6; 	*id++ = 5; 	*id++ = 2;
-		*id++ = 2; 	*id++ = 5; 	*id++ = 1;
-
-		boxModel = new Graphics::Poly(vertices, indices);
-		static_cast<Graphics::Poly*>(boxModel)->SetFrame();
-		
-		box.SetModel(boxModel);
-		box.SetPosition(glm::vec3(0,2.0,0));
-		box.SetVelocity(glm::vec3(1.0,0,0));
-		box.SetMass(1.0f);
-
-		floor.SetModel(boxModel);
-		floor.SetPosition(glm::vec3(0));
 	}
 
 	void Simulation::OnWindowResize(GLFWwindow* window, int width, int height)
@@ -127,8 +79,6 @@ namespace Demo
 
 		if (pitch > 89.0f) pitch = 89.0f;
 		if (pitch < -89.0f) pitch = -89.0f;
-		if (yaw > 89.0f) yaw = 89.0f;
-		if (yaw < -89.0f) yaw = -89.0f;
 
 		Camera::GetInstance().Rotate(yaw, pitch, 0);
 	}
@@ -179,8 +129,10 @@ namespace Demo
 
 	void Simulation::Step(const float dt)
 	{
-		box.Update(dt);
-		floor.Update(dt);
+		for each (Physics::Body body in bodies)
+		{
+			body.Update(dt);
+		}
 	}
 
 	void Simulation::Update()
@@ -202,31 +154,25 @@ namespace Demo
 		}
 
 		// Graphics update
-		glm::mat4 T(1), R(1), S(1), M(1);
+		glm::mat4 T(1), R(1), S(1), M(1), MVP(1);
 		glm::mat4 V = Camera::GetInstance().GetViewMatrix();
 		glm::mat4 P = Camera::GetInstance().GetProjectionMatrix();
-		T = glm::translate(box.GetPosition());
-		R = glm::toMat4(box.GetOrientation());
-		S = glm::scale(glm::vec3(1.0));
-		M = T * R * S;
-		glm::mat4 MVP = P * V * M;
-		box.GetModel()->SetMVP(MVP);
-		box.GetModel()->SetColor(glm::vec3(0.3, 0.9, 0.3));
-		box.GetModel()->Render();
-		Poly* frame = static_cast<Poly*>(box.GetModel())->GetFrame();
-		frame->SetMVP(MVP);
-		frame->Render();
 
-		T = glm::translate(floor.GetPosition());
-		R = glm::toMat4(floor.GetOrientation());
-		S = glm::scale(glm::vec3(10.0,1.0,10.0));
-		M = T * R * S;
-		MVP = P * V * M;
-		floor.GetModel()->SetMVP(MVP);
-		floor.GetModel()->SetColor(glm::vec3(0.7,0.7,0.9));
-		floor.GetModel()->Render();
-		frame->SetMVP(MVP);
-		frame->Render();
+		for each (Physics::Body body in bodies)
+		{
+			Model* m = body.GetModel();
+			T = glm::translate(body.GetPosition());
+			R = glm::toMat4(body.GetOrientation());
+			S = glm::scale(glm::vec3(1.0)); // ToDo
+			M = T * R * S;
+			MVP = P * V * M;
+			m->SetMVP(MVP);
+			m->Render();
+
+			Model* f = m->GetFrame();
+			f->SetMVP(MVP);
+			f->Render();
+		}
 
 		// Debug Draw
 		if (debugDraw)
@@ -262,7 +208,5 @@ namespace Demo
 	}
 
 	Simulation::~Simulation()
-	{
-		delete boxModel;
-	}
+	{}
 }

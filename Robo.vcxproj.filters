@@ -7,6 +7,12 @@
     <Filter Include="Physics">
       <UniqueIdentifier>{07d3b3ee-24a6-4117-a199-e9ab544eba77}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Simulation">
+      <UniqueIdentifier>{c53d7c52-25ec-4cb0-9512-ed7d91b257bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{e4cc39e0-d967-41ce-b276-5a752b73ccd6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\stb_image.h">
@@ -21,7 +27,6 @@
     <ClInclude Include="Graphics\Poly.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Simulation.h" />
     <ClInclude Include="Graphics\Camera.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -30,6 +35,21 @@
     </ClInclude>
     <ClInclude Include="Physics\Body.h">
       <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation\ParserTest.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation\Simulation.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\Mesh.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\ObjParser.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation\Simulations.h">
+      <Filter>Simulation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -44,12 +64,20 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="Graphics\Camera.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Physics\Body.cpp">
       <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\Simulation.cpp">
+      <Filter>Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\ParserTest.cpp">
+      <Filter>Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry\ObjParser.cpp">
+      <Filter>Geometry</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

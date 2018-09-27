@@ -1,12 +1,12 @@
 
 #pragma once
 
-#include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <vector>
 #include "Body.h"
 
-namespace Demo
+namespace Simulation
 {
 	class Simulation
 	{
@@ -38,10 +38,7 @@ namespace Demo
 		bool pauseStep;
 		bool advanceStep;
 
-		Physics::Body box;
-		Physics::Body floor;
-
-		Graphics::Model* boxModel;
+		std::vector<Physics::Body> bodies;
 
 	public:
 		Simulation();
@@ -62,6 +59,6 @@ namespace Demo
 
 		void Step(const float dt);
 
-		virtual void Update();
+		void Update();
 	};
 }
