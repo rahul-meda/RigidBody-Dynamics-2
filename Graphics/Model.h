@@ -28,12 +28,17 @@ namespace Graphics
 
 		glm::mat4 GetMVP() const;
 
+		virtual void SetFrame(const std::vector<glm::vec3>& vertices, const std::vector<int>& indices) {};
+		virtual Model* GetFrame() const { return frame; };
+
 	protected:
 		GLenum primType;
 
 		std::vector<glm::vec3> vertices;
 
 		std::vector<int> indices;
+
+		Model* frame;
 
 	private:
 		GLuint vaoID;

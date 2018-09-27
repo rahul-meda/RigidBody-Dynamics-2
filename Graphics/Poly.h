@@ -19,20 +19,16 @@ namespace Graphics
 			delete frame;
 		}
 
-		void SetFrame()
+		void SetFrame(const std::vector<glm::vec3>& vertices, const std::vector<int>& indices)
 		{
 			frame = new Poly(vertices, indices);
-			frame->primType = GL_LINES;
+			frame->SetPrimitive(GL_LINES);
 			frame->SetColor(glm::vec3(0.9));
 		}
 
-		Poly* GetFrame() const
+		Model* GetFrame() const
 		{
 			return frame;
 		}
-
-	private:
-		// to draw a frame around the polyhedron (give it a 3D effect without ligting or shadows)
-		Poly* frame;
 	};
 }
