@@ -8,6 +8,8 @@ namespace Graphics
 	class Poly : public Model
 	{
 	public:
+		Poly();
+
 		Poly(const std::vector<glm::vec3>& vertices, const std::vector<int>& indices)
 			:Model(vertices, indices)
 		{
@@ -26,9 +28,12 @@ namespace Graphics
 			frame->SetColor(glm::vec3(0.9));
 		}
 
-		Model* GetFrame() const
+		Poly* GetFrame() const
 		{
 			return frame;
 		}
+
+		private:
+			Poly* frame;
 	};
 }

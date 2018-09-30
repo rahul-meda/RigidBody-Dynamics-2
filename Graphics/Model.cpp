@@ -9,7 +9,7 @@
 namespace Graphics
 {
 	Model::Model(const std::vector<glm::vec3>& vertices, const std::vector<int>& indices)
-		: vertices(vertices), indices(indices), color(0.3, 0.9, 0.3), frame(nullptr)
+		: vertices(vertices), indices(indices), color(0.3, 0.9, 0.3)
 	{
 		shader.LoadFromFile(GL_VERTEX_SHADER, "Graphics/shader.vert");
 		shader.LoadFromFile(GL_FRAGMENT_SHADER, "Graphics/shader.frag");

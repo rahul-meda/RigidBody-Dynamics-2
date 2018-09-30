@@ -22,7 +22,7 @@ namespace Geometry
 			ParseLine(objFaces, mesh, line);
 		}
 
-		for each (ObjFace objFace in objFaces)
+		for (ObjFace objFace : objFaces)
 		{
 			AddFace(mesh, objFace.vids);
 		}
@@ -86,7 +86,7 @@ namespace Geometry
 		f->id = mesh.faces.size() + 1;
 
 		HEdge* prev = nullptr;
-		for each (const int& vid in vids)
+		for (const int& vid : vids)
 		{
 			HEdge* e = new HEdge();
 			e->tail = mesh.vertices[vid - 1];	// ToDo:check the assumption that this is the tail and not the head
@@ -114,7 +114,7 @@ namespace Geometry
 		std::pair<int, int> vPair;
 		int vid1, vid2;
 		HEdge* curr;
-		for each (HEdge* e in mesh.edges)
+		for (HEdge* e : mesh.edges)
 		{
 			vid1 = e->tail->id;
 			vid2 = e->next->tail->id;
@@ -145,7 +145,7 @@ namespace Geometry
 	{
 		std::vector<HEdge*> l1, l2;
 
-		for each (HEdge* e in mesh.edges)
+		for (HEdge* e : mesh.edges)
 		{
 			if (!e->duplicate)
 				l1.push_back(e);
@@ -155,12 +155,12 @@ namespace Geometry
 
 		mesh.edges.clear();
 
-		for each (HEdge* e in l1)
+		for (HEdge* e : l1)
 		{
 			mesh.edges.push_back(e);
 		}
 
-		for each (HEdge* e in l2)
+		for (HEdge* e : l2)
 		{
 			mesh.edges.push_back(e);
 		}

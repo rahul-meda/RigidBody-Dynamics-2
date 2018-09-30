@@ -1,22 +1,25 @@
 
 #pragma once
 
+#include "Collider.h"
 #include "Body.h"
 
 namespace Physics
 {
 	Body::Body()
-		:invMass(0),
+		:invMass(1.0),
 		localInvInertia(0),
 		invInertia(0),
+		density(1.0f),
+		restitution(0.3f),
+		friction(0.7f),
 		position(0),
 		orientation(0,1,0,0),
 		R(1),
 		velocity(0),
 		angularVelocity(0),
 		forceSum(0),
-		torqueSum(0),
-		model(nullptr)
+		torqueSum(0)
 	{}
 
 	void Body::SetMass(const float m)
@@ -55,7 +58,37 @@ namespace Physics
 		return invInertia;
 	}
 
-	void Body::SetPosition(const glm::vec3 pos)
+	void Body::SetDensity(const float d)
+	{
+		density = d;
+	}
+
+	float Body::GetDensity() const
+	{
+		return density;
+	}
+
+	void Body::SetRestitution(const float e)
+	{
+		restitution = e;
+	}
+
+	float Body::GetRestitution() const
+	{
+		return restitution;
+	}
+
+	void Body::SetFriction(const float u)
+	{
+		friction = u;
+	}
+
+	float Body::GetFriction() const
+	{
+		return friction;
+	}
+
+	void Body::SetPosition(const glm::vec3& pos)
 	{
 		position = pos;
 	}
@@ -65,7 +98,7 @@ namespace Physics
 		return position;
 	}
 
-	void Body::SetOrientation(const glm::quat o)
+	void Body::SetOrientation(const glm::quat& o)
 	{
 		orientation = glm::normalize(o);
 	}
@@ -75,7 +108,7 @@ namespace Physics
 		return orientation;
 	}
 
-	void Body::SetVelocity(const glm::vec3 vel)
+	void Body::SetVelocity(const glm::vec3& vel)
 	{
 		velocity = vel;
 	}
@@ -85,7 +118,7 @@ namespace Physics
 		return velocity;
 	}
 
-	void Body::SetAngularVelocity(const glm::vec3 w)
+	void Body::SetAngularVelocity(const glm::vec3& w)
 	{
 		angularVelocity = w;
 	}
@@ -95,14 +128,79 @@ namespace Physics
 		return angularVelocity;
 	}
 
-	void Body::SetModel(Graphics::Model* m)
+	const glm::vec3 Body::LocalToGlobalVec(const glm::vec3& v) const
 	{
-		model = m;
+		return R * v;
 	}
 
-	Graphics::Model* Body::GetModel() const
+	const glm::vec3 Body::GlobalToLocalVec(const glm::vec3& v) const
 	{
-		return model;
+		return glm::transpose(R) * v;
+	}
+
+	const glm::vec3 Body::LocalToGlobalPoint(const glm::vec3& p) const
+	{
+		return position + R * p;
+	}
+
+	const glm::vec3 Body::GlobalToLocalPoint(const glm::vec3& p) const
+	{
+		return glm::transpose(R) * (p - position);
+	}
+
+	void Body::AddCollider(Collider* collider)
+	{
+		collider->SetBody(this);
+
+		if (invMass == 0) return;
+
+		colliders.push_back(collider);
+
+		localCentroid = glm::vec3(0.0f);
+		invMass = 0.0f;
+
+		collider->CalculateMass();
+
+		float mass = 0.0f;		// mass of the body
+
+		for (Collider* c : colliders)
+		{
+			mass += c->GetMass();
+
+			localCentroid += c->GetMass() * c->GetCentroid();
+		}
+
+		assert(mass != 0);
+
+		invMass = 1.0f / mass;
+
+		localCentroid *= invMass;
+		centroid = LocalToGlobalPoint(localCentroid);
+
+		glm::mat3 inertiaLocal(0);
+		for (Collider* c : colliders)
+		{
+			glm::vec3 r = localCentroid - c->GetCentroid();
+			float rDotr = glm::dot(r, r);
+			glm::mat3 rOutr = glm::outerProduct(r, r);
+
+			// Parallel axis theorem
+			// Accumulate local inertia tensors
+			inertiaLocal += c->GetInertia() + c->GetMass() * (rDotr * glm::mat3(1.0) - rOutr);
+		}
+
+		localInvInertia = glm::inverse(inertiaLocal);
+	}
+
+	void Body::ApplyForce(const glm::vec3& force)
+	{
+		forceSum += force;
+	}
+
+	void Body::ApplyForce(const glm::vec3& force, const glm::vec3& p)
+	{
+		forceSum += force;
+		torqueSum += glm::cross(p - centroid, force);
 	}
 
 	void Body::Update(const float dt)
@@ -116,10 +214,14 @@ namespace Physics
 		forceSum = glm::vec3(0);
 		torqueSum = glm::vec3(0);
 
-		position += velocity * dt;
+		centroid += velocity * dt;
 		orientation += 0.5f * glm::quat(0, angularVelocity) * orientation * dt;
 
 		orientation = glm::normalize(orientation);
 		R = glm::toMat3(orientation);
+
+		invInertia = glm::transpose(R) * localInvInertia * R;
+
+		position = centroid - LocalToGlobalVec(localCentroid);
 	}
 }

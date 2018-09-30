@@ -61,7 +61,7 @@ namespace Geometry
 		// used by gaphics to render solid mesh in triangle mode
 		void GetTriangleIndices(std::vector<int>& indices) const
 		{
-			for each (HFace* f in faces)
+			for (HFace* f : faces)
 			{
 				HEdge* start = f->edge;
 				HEdge* e = start;

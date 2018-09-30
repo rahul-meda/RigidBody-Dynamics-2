@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 #include "Body.h"
+#include "Collider.h"
 
 namespace Simulation
 {
@@ -39,6 +40,7 @@ namespace Simulation
 		bool advanceStep;
 
 		std::vector<Physics::Body> bodies;
+		std::vector<Physics::Collider*> colliders;
 
 	public:
 		Simulation();

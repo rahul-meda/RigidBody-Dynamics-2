@@ -129,7 +129,7 @@ namespace Simulation
 
 	void Simulation::Step(const float dt)
 	{
-		for each (Physics::Body body in bodies)
+		for (Physics::Body& body : bodies)
 		{
 			body.Update(dt);
 		}
@@ -157,21 +157,11 @@ namespace Simulation
 		glm::mat4 T(1), R(1), S(1), M(1), MVP(1);
 		glm::mat4 V = Camera::GetInstance().GetViewMatrix();
 		glm::mat4 P = Camera::GetInstance().GetProjectionMatrix();
+		Physics::Collider* collider;  Model*m;
 
-		for each (Physics::Body body in bodies)
+		for (auto collider : colliders)
 		{
-			Model* m = body.GetModel();
-			T = glm::translate(body.GetPosition());
-			R = glm::toMat4(body.GetOrientation());
-			S = glm::scale(glm::vec3(1.0)); // ToDo
-			M = T * R * S;
-			MVP = P * V * M;
-			m->SetMVP(MVP);
-			m->Render();
-
-			Model* f = m->GetFrame();
-			f->SetMVP(MVP);
-			f->Render();
+			collider->Render();
 		}
 
 		// Debug Draw

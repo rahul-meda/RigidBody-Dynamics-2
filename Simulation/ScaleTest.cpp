@@ -1,17 +1,17 @@
 
-#include "ParserTest.h"
+#include "ScaleTest.h"
 #include "ObjParser.h"
 #include "Poly.h"
 
 namespace Simulation
 {
-	ParserTest& ParserTest::GetInstance()
+	ScaleTest& ScaleTest::GetInstance()
 	{
-		static ParserTest instance;
+		static ScaleTest instance;
 		return instance;
 	}
 
-	void ParserTest::OnInit(GLFWwindow* window)
+	void ScaleTest::OnInit(GLFWwindow* window)
 	{
 		Simulation::OnInit(window);
 
@@ -31,8 +31,15 @@ namespace Simulation
 		Physics::Body body;
 		Graphics::Model* box = new Graphics::Poly(vertices, indices);
 		body.SetPosition(glm::vec3(0));
+		body.SetVelocity(glm::vec3(1.0,0,0));
+		body.SetMass(1.0);
 		indices.clear();
 		mesh.GetLineIndices(indices);
+
+		bodies.push_back(body);
+		
+		body.SetPosition(glm::vec3(0,-2.0,0));
+		body.SetMass(0.0);
 
 		bodies.push_back(body);
 	}

@@ -5,7 +5,7 @@
 #include <vector>
 #include "Simulation/Simulations.h"
 
-Simulation::Simulation* sim = &Simulation::ParserTest::GetInstance();
+Simulation::Simulation* sim = &Simulation::InertiaTest::GetInstance();
 
 void OnWindowResize(GLFWwindow* window, int width, int height)
 {

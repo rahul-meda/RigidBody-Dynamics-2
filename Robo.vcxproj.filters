@@ -51,6 +51,18 @@
     <ClInclude Include="Simulation\Simulations.h">
       <Filter>Simulation</Filter>
     </ClInclude>
+    <ClInclude Include="Simulation\ScaleTest.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Collider.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation\InertiaTest.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\HullCollider.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
@@ -78,6 +90,18 @@
     </ClCompile>
     <ClCompile Include="Geometry\ObjParser.cpp">
       <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\ScaleTest.cpp">
+      <Filter>Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\InertiaTest.cpp">
+      <Filter>Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\HullCollider.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Collider.cpp">
+      <Filter>Physics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
