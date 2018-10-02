@@ -21,9 +21,27 @@ namespace Physics
 	public:
 		HullCollider(const Geometry::HMesh& mesh);
 
-		void CalculateMass();
+		std::vector<Geometry::HVertex*>& GetVertices();
+
+		std::vector<Geometry::HEdge*>& GetEdges();
+
+		std::vector<Geometry::HFace*>& GetFaces();
+
+		int GetVertexCount() const;
+		int GetEdgeCount() const;
+		int GetFaceCount() const;
+
+		Geometry::HVertex* GetVertex(int i) const;
+		Geometry::HEdge* GetEdge(int i) const;
+		Geometry::HFace* GetFace(int i) const;
 
 		void SetScale(const glm::vec3 s);
+
+		// calculaate mass and inertia from geometry data
+		void CalculateMass();
+
+		// returns the furthest vertex on the hull in given direction
+		int GetSupport(const glm::vec3& dir) const;
 
 		void SetModel(Graphics::Model* model);
 

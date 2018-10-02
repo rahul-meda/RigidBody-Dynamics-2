@@ -76,6 +76,10 @@ namespace Physics
 
 		const glm::vec3 GlobalToLocalPoint(const glm::vec3& p) const;
 
+		// transform from A's local space to this body's space
+		const glm::vec3 LocalToLocalVec(Body* A, const glm::vec3& v) const;
+		const glm::vec3 LocaltoLocalPoint(Body* A, const glm::vec3& p) const;
+
 		void AddCollider(Collider* collider);
 
 		// apply force at c.o.m

@@ -148,6 +148,16 @@ namespace Physics
 		return glm::transpose(R) * (p - position);
 	}
 
+	const glm::vec3 Body::LocalToLocalVec(Body* A, const glm::vec3& v) const
+	{
+		return GlobalToLocalVec(A->LocalToGlobalVec(v));
+	}
+
+	const glm::vec3 Body::LocaltoLocalPoint(Body* A, const glm::vec3& p) const
+	{
+		return GlobalToLocalPoint(A->LocalToGlobalPoint(p));
+	}
+
 	void Body::AddCollider(Collider* collider)
 	{
 		collider->SetBody(this);

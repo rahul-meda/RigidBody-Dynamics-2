@@ -95,6 +95,7 @@
     <ClInclude Include="Physics\Body.h" />
     <ClInclude Include="Physics\Collider.h" />
     <ClInclude Include="Physics\HullCollider.h" />
+    <ClInclude Include="Physics\NarrowPhase.h" />
     <ClInclude Include="Simulation\InertiaTest.h" />
     <ClInclude Include="Simulation\ParserTest.h" />
     <ClInclude Include="Simulation\ScaleTest.h" />

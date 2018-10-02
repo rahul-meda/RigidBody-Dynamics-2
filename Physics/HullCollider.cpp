@@ -15,6 +15,62 @@ namespace Physics
 		faces = mesh.faces;
 	}
 
+	std::vector<Geometry::HVertex*>& HullCollider::GetVertices()
+	{
+		return vertices;
+	}
+
+	std::vector<Geometry::HEdge*>& HullCollider::GetEdges()
+	{
+		return edges;
+	}
+
+	std::vector<Geometry::HFace*>& HullCollider::GetFaces()
+	{
+		return faces;
+	}
+
+	int HullCollider::GetVertexCount() const
+	{
+		return vertices.size();
+	}
+
+	int HullCollider::GetEdgeCount() const
+	{
+		return edges.size()/2;
+	}
+
+	int HullCollider::GetFaceCount() const
+	{
+		return faces.size();
+	}
+
+	Geometry::HVertex* HullCollider::GetVertex(int i) const
+	{
+		return vertices[i];
+	}
+
+	Geometry::HEdge* HullCollider::GetEdge(int i) const
+	{
+		return edges[i];
+	}
+
+	Geometry::HFace* HullCollider::GetFace(int i) const
+	{
+		return faces[i];
+	}
+
+	void HullCollider::SetScale(const glm::vec3 s)
+	{
+		scale = s;
+		for (auto v : vertices)
+		{
+			v->position.x *= scale.x;
+			v->position.y *= scale.y;
+			v->position.z *= scale.z;
+		}
+	}
+
 	void HullCollider::CalculateMass()
 	{
 		glm::vec3 diag(0.0f);
@@ -74,15 +130,24 @@ namespace Physics
 		inertia *= mass;
 	}
 
-	void HullCollider::SetScale(const glm::vec3 s)
+	// To Do : Hill Climbing
+	int HullCollider::GetSupport(const glm::vec3& dir) const
 	{
-		scale = s;
-		for (auto v : vertices)
+		float dot = 0.0f;
+		float maxDot = FLT_MIN;
+		int index = -1;
+
+		for (int i = 0; i < vertices.size(); i++)
 		{
-			v->position.x *= scale.x;
-			v->position.y *= scale.y;
-			v->position.z *= scale.z;
+			dot = glm::dot(vertices[i]->position, dir);
+			if (dot > maxDot)
+			{
+				maxDot = dot;
+				index = i;
+			}
 		}
+
+		return index;
 	}
 
 	void HullCollider::SetModel(Graphics::Model* model)

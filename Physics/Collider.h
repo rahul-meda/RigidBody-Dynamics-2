@@ -8,16 +8,16 @@ namespace Physics
 {
 	class Body;
 
-	enum Shape
-	{
-		Sphere = 1,
-		Hull,
-		Cylinder,
-		Capsule
-	};
-
 	class Collider
 	{
+	public:
+		enum Shape
+		{
+			Sphere = 1,
+			Hull,
+			Cylinder,
+			Capsule
+		};
 	protected:
 		float mass;
 		glm::mat3 inertia;
