@@ -42,6 +42,7 @@ bool QueryFaceAxes(FaceQuery& query, HullCollider* A, HullCollider* B);
 // Axes are all possible cross products of edge combinations (edgeA, edgeB)
 // Edge Pruing - Guass Map Optimization - Dirk Gregorius - GDC 2013
 // The possible separating axes are the edges that form a face on the Minkowski difference (A-B)
+// The edges found to be intersecting on the gauss map are the supporting edges - so no need to check projections
 bool QueryEdgeAxes(EdgeQuery& query, HullCollider*A, HullCollider* B);
 
 // @params A, B, C, D are faces of hull that represent points on the Gauss Map

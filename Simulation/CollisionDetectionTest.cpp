@@ -50,6 +50,7 @@ void CollisionDetectionTest::OnInit(GLFWwindow* window)
 	boxCollider->SetModel(boxModel);
 	boxCollider->SetScale(glm::vec3(2.0, 2.0, 2.0));
 	body.SetPosition(glm::vec3(0.0, 4.0, 0.0));
+	body.SetOrientation(glm::quat(0.78, 0,0,-1));
 	bodies.push_back(body);
 	bodies.back().AddCollider(boxCollider);
 	colliders.push_back(boxCollider);

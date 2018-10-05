@@ -170,21 +170,21 @@ void CreateFaceContact(std::vector<Manifold>& contacts, HullCollider* incident, 
 	std::vector<HalfSpace> planes;	// the clipping planes - faces represented by each edge on the incident face
 
 	// extract the vertices from reference face - in world space
-	auto start = reference->GetFace(referenceFace)->edge;
+	auto start = incident->GetFace(incidentFace)->edge;
 	auto edge = start;
 	do {
-		inPoly.push_back(reference->GetBody()->LocalToGlobalPoint(edge->tail->position));
+		inPoly.push_back(incident->GetBody()->LocalToGlobalPoint(edge->tail->position));
 		edge = edge->next;
 	} while (edge != start);
 
 	{
 		// extract the faces representing the clipping planes - in world space
 		glm::vec3 normal, point;
-		start = incident->GetFace(incidentFace)->edge;
+		start = reference->GetFace(referenceFace)->edge;
 		edge = start;
 		do {
-			normal = incident->GetBody()->LocalToGlobalVec(edge->twin->face->normal);
-			point = incident->GetBody()->LocalToGlobalVec(edge->tail->position);
+			normal = reference->GetBody()->LocalToGlobalVec(edge->twin->face->normal);
+			point = reference->GetBody()->LocalToGlobalPoint(edge->tail->position);
 			planes.push_back(HalfSpace(normal, point));
 			edge = edge->next;
 		} while (edge != start);
