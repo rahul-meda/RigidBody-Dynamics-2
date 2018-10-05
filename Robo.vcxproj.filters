@@ -63,6 +63,18 @@
     <ClInclude Include="Physics\HullCollider.h">
       <Filter>Physics</Filter>
     </ClInclude>
+    <ClInclude Include="Physics\NarrowPhase.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Manifold.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\Geometry.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation\CollisionDetectionTest.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
@@ -102,6 +114,15 @@
     </ClCompile>
     <ClCompile Include="Physics\Collider.cpp">
       <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\NarrowPhase.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry\Geometry.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\CollisionDetectionTest.cpp">
+      <Filter>Simulation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

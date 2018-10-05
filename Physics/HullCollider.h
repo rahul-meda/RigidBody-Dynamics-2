@@ -6,47 +6,44 @@
 #include "Mesh.h"
 #include "Poly.h" 
 
-namespace Physics
+class HullCollider : public Collider
 {
-	class HullCollider : public Collider
-	{
-	private:
-		std::vector<Geometry::HVertex*> vertices;
-		std::vector<Geometry::HEdge*> edges;
-		std::vector<Geometry::HFace*> faces;
+private:
+	std::vector<HVertex*> vertices;
+	std::vector<HEdge*> edges;
+	std::vector<HFace*> faces;
 
-		Graphics::Poly* poly;
-		Graphics::Poly* frame;
+	Poly* poly;
+	Poly* frame;
 
-	public:
-		HullCollider(const Geometry::HMesh& mesh);
+public:
+	HullCollider(const HMesh& mesh);
 
-		std::vector<Geometry::HVertex*>& GetVertices();
+	std::vector<HVertex*>& GetVertices();
 
-		std::vector<Geometry::HEdge*>& GetEdges();
+	std::vector<HEdge*>& GetEdges();
 
-		std::vector<Geometry::HFace*>& GetFaces();
+	std::vector<HFace*>& GetFaces();
 
-		int GetVertexCount() const;
-		int GetEdgeCount() const;
-		int GetFaceCount() const;
+	int GetVertexCount() const;
+	int GetEdgeCount() const;
+	int GetFaceCount() const;
 
-		Geometry::HVertex* GetVertex(int i) const;
-		Geometry::HEdge* GetEdge(int i) const;
-		Geometry::HFace* GetFace(int i) const;
+	HVertex* GetVertex(int i) const;
+	HEdge* GetEdge(int i) const;
+	HFace* GetFace(int i) const;
 
-		void SetScale(const glm::vec3 s);
+	void SetScale(const glm::vec3 s);
 
-		// calculaate mass and inertia from geometry data
-		void CalculateMass();
+	// calculaate mass and inertia from geometry data
+	void CalculateMass();
 
-		// returns the furthest vertex on the hull in given direction
-		int GetSupport(const glm::vec3& dir) const;
+	// returns the furthest vertex on the hull in given direction
+	int GetSupport(const glm::vec3& dir) const;
 
-		void SetModel(Graphics::Model* model);
+	void SetModel(Model* model);
 
-		void SetColor(const glm::vec3 color);
+	void SetColor(const glm::vec3 color);
 
-		void Render();
-	};
-}
+	void Render();
+};

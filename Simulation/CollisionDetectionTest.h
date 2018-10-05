@@ -3,15 +3,15 @@
 
 #include "Simulation.h"
 
-class InertiaTest : public Simulation
+class CollisionDetectionTest : public Simulation
 {
 public:
-	static InertiaTest& GetInstance();
+	static CollisionDetectionTest& GetInstance();
 
 	void OnInit(GLFWwindow* window);
 
 	void OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods);
 
 private:
-	InertiaTest() {};
+	CollisionDetectionTest() {};
 };

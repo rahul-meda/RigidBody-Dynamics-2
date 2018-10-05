@@ -5,47 +5,44 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-namespace Graphics
+class Model
 {
-	class Model
-	{
-	public:
-		Model(const std::vector<glm::vec3>& vertices, const std::vector<int>& indices);
+public:
+	Model(const std::vector<glm::vec3>& vertices, const std::vector<int>& indices);
 
-		~Model();
+	~Model();
 
-		void Render();
+	void Render();
 
-		void SetPrimitive(GLenum type);
+	void SetPrimitive(GLenum type);
 
-		void FillVertexBuffer(GLfloat* pBuffer);
+	void FillVertexBuffer(GLfloat* pBuffer);
 
-		void FillIndexBuffer(GLuint* pBuffer);
+	void FillIndexBuffer(GLuint* pBuffer);
 
-		void SetColor(const glm::vec3 color);
+	void SetColor(const glm::vec3 color);
 
-		void SetMVP(const glm::mat4& MVP);
+	void SetMVP(const glm::mat4& MVP);
 
-		glm::mat4 GetMVP() const;
+	glm::mat4 GetMVP() const;
 
-	protected:
-		GLenum primType;
+protected:
+	GLenum primType;
 
-		std::vector<glm::vec3> vertices;
+	std::vector<glm::vec3> vertices;
 
-		std::vector<int> indices;
+	std::vector<int> indices;
 
-	private:
-		GLuint vaoID;
+private:
+	GLuint vaoID;
 
-		GLuint vboVerticesID;
+	GLuint vboVerticesID;
 
-		GLuint vboIndicesID;
+	GLuint vboIndicesID;
 
-		Shader shader;
+	Shader shader;
 
-		glm::vec3 color;
+	glm::vec3 color;
 
-		glm::mat4 MVP;
-	};
-}
+	glm::mat4 MVP;
+};

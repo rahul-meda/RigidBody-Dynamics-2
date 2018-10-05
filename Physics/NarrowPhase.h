@@ -2,58 +2,63 @@
 #pragma once
 
 #include <vector>
+#include <glm/glm.hpp>
+#include "Manifold.h"
+#include "HullCollider.h"
 
-namespace Physics
+// detect collision b/w colliders
+// and generate detailed collision data
+
+// Collision info for nearest face features b/w 2 colliders A and B
+struct FaceQuery
 {
-	// detect collision b/w colliders
-	// and generate detailed collision data
+	float separation;	// negative values indicate point of B inside face of A
 
-	class Manifold;
-	class Collider;
-	class HullCollider;
+	int faceIndex;		// index of face of collider A
 
-	// Collision info for nearest face features b/w 2 colliders A and B
-	struct FaceQuery
-	{
-		float separation;	// negative values indicate point of B inside face of A
+	int vertIndex;		// index of best vertex of collider B (min penetrating vertex)
+};
 
-		int faceIndex;		// index of face of collider A
+// Collision info for nearest edge features b/w 2 colliders A and B
+struct EdgeQuery
+{
+	float separation;	// negative values indicate overlap b/w edges
 
-		int vertIndex;		// index of best vertex of collider B (min penetrating vertex)
-	};
+	int edgeIndex1;		// indices of edges of A and B
+	int edgeIndex2;
 
-	// Collision info for nearest edge features b/w 2 colliders A and B
-	struct EdgeQuery
-	{
-		float separation;	// negative values indicate overlap b/w edges
+	glm::vec3 normal;	// parpendicular to both edges, and pointing from A to B
+};
 
-		int edgeIndex1;		// indices of edges of A and B
-		int edgeIndex2;
+// SAT
+// Project hulls onto every possible separating axis
+// and check for overlap of projections
 
-		glm::vec3 normal;	// parpendicular to both edges, and pointing from A to B
-	};
+// Axes are face normals of A
+// Retruns true if there is overlap on every face axis
+// Store minimizing(least penetrating) vertex of B inside A, and assosiated face of A
+bool QueryFaceAxes(FaceQuery& query, HullCollider* A, HullCollider* B);
 
-	// SAT
-	// Project hulls onto every possible separating axis
-	// and check for overlap of projections
+// Axes are all possible cross products of edge combinations (edgeA, edgeB)
+// Edge Pruing - Guass Map Optimization - Dirk Gregorius - GDC 2013
+// The possible separating axes are the edges that form a face on the Minkowski difference (A-B)
+bool QueryEdgeAxes(EdgeQuery& query, HullCollider*A, HullCollider* B);
 
-	// Axes are face normals of A
-	// Retruns true if there is overlap on every face axis
-	// Store minimizing(least penetrating) vertex of B inside A, and assosiated face of A
-	bool QueryFaceAxes(FaceQuery& query, HullCollider* A, HullCollider* B);
+// @params A, B, C, D are faces of hull that represent points on the Gauss Map
+// The arcs connecting the faces represent the edges
+// Two edges form a face on the Minkowski difference if their associated arcs intersect
+// A-B is arc1(edge from hull A) and C-D is arc2(edge from hull B)
+bool IsMinkowskiFace(const glm::vec3& A, const glm::vec3& B, const glm::vec3& B_x_A, const glm::vec3& C, const glm::vec3& D, const glm::vec3& D_x_C);
 
-	// Axes are all possible cross products of edge combinations (edgeA, edgeB)
-	// Edge Pruing - Guass Map Optimization - Dirk Gregorius - GDC 2013
-	// The possible separating axes are the edges that form a face on the Minkowski difference (A-B)
-	bool QueryEdgeAxes(EdgeQuery& query, HullCollider*A, HullCollider* B);
+void CreateEdgeContact(std::vector<Manifold>& contacts, HullCollider* A, HullCollider*B, const EdgeQuery& query);
 
-	// @params A, B, C, D are faces of hull that represent points on the Gauss Map
-	// The arcs connecting the faces represent the edges
-	// Two edges form a face on the Minkowski difference if their associated arcs intersect
-	// A-B is arc1(edge from hull A) and C-D is arc2(edge from hull B)
-	bool IsMinkowskiFace(const glm::vec3& A, const glm::vec3& B, const glm::vec3& B_x_A, const glm::vec3& C, const glm::vec3& D, const glm::vec3& D_x_C);
+// the most anti-parallel face of incident hull compared to reference face
+int FindIncidentFace(HullCollider* incident, HullCollider* reference, int referenceFace);
 
-	void DetectHullvsHull(std::vector<Manifold>& contacts, HullCollider* A, HullCollider* B);
+// create contact patch by clipping incident face against reference face
+// Sutherland Hodgman - Ref: Orange book
+void CreateFaceContact(std::vector<Manifold>& contacts, HullCollider* incident, HullCollider* reference, int incidentFace, int referenceFace);
 
-	void DetectCollision(std::vector<Manifold>& contacts, Collider* A, Collider* B);
-}
+void DetectHullvsHull(std::vector<Manifold>& contacts, HullCollider* A, HullCollider* B);
+
+void DetectCollision(std::vector<Manifold>& contacts, Collider* A, Collider* B);

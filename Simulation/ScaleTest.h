@@ -3,16 +3,13 @@
 
 #include "Simulation.h"
 
-namespace Simulation
+class ScaleTest : public Simulation
 {
-	class ScaleTest : public Simulation
-	{
-	public:
-		static ScaleTest& GetInstance();
+public:
+	static ScaleTest& GetInstance();
 
-		void OnInit(GLFWwindow* window);
+	void OnInit(GLFWwindow* window);
 
-	private:
-		ScaleTest() {};
-	};
-}
+private:
+	ScaleTest() {};
+};

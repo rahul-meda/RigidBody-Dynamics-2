@@ -4,234 +4,233 @@
 #include "Collider.h"
 #include "Body.h"
 
-namespace Physics
+Body::Body()
+	:invMass(1.0),
+	localInvInertia(0),
+	invInertia(0),
+	density(1.0f),
+	restitution(0.3f),
+	friction(0.7f),
+	position(0),
+	orientation(1, 0, 0, 0),
+	R(1),
+	velocity(0),
+	angularVelocity(0),
+	forceSum(0),
+	torqueSum(0)
+{}
+
+void Body::SetMass(const float m)
 {
-	Body::Body()
-		:invMass(1.0),
-		localInvInertia(0),
-		invInertia(0),
-		density(1.0f),
-		restitution(0.3f),
-		friction(0.7f),
-		position(0),
-		orientation(0,1,0,0),
-		R(1),
-		velocity(0),
-		angularVelocity(0),
-		forceSum(0),
-		torqueSum(0)
-	{}
+	if (m == 0)	// static body
+		invMass = 0;
+	else
+		invMass = 1.0f / m;
+}
 
-	void Body::SetMass(const float m)
+float Body::GetMass() const
+{
+	if (invMass == 0)
+		return 0;
+
+	return 1.0f / invMass;
+}
+
+void Body::SetInvMass(const float im)
+{
+	invMass = im;
+}
+
+float Body::GetInvMass() const
+{
+	return invMass;
+}
+
+void Body::SetInertia(const glm::mat3& inertia)
+{
+	localInvInertia = glm::inverse(inertia);
+}
+
+glm::mat3 Body::GetInertia() const
+{
+	return invInertia;
+}
+
+void Body::SetDensity(const float d)
+{
+	density = d;
+}
+
+float Body::GetDensity() const
+{
+	return density;
+}
+
+void Body::SetRestitution(const float e)
+{
+	restitution = e;
+}
+
+float Body::GetRestitution() const
+{
+	return restitution;
+}
+
+void Body::SetFriction(const float u)
+{
+	friction = u;
+}
+
+float Body::GetFriction() const
+{
+	return friction;
+}
+
+void Body::SetPosition(const glm::vec3& pos)
+{
+	position = pos;
+
+	centroid = position + LocalToGlobalVec(localCentroid);
+}
+
+glm::vec3 Body::GetPosition() const
+{
+	return position;
+}
+
+void Body::SetOrientation(const glm::quat& o)
+{
+	orientation = glm::normalize(o);
+}
+
+glm::quat Body::GetOrientation() const
+{
+	return orientation;
+}
+
+void Body::SetVelocity(const glm::vec3& vel)
+{
+	velocity = vel;
+}
+
+glm::vec3 Body::GetVelocity() const
+{
+	return velocity;
+}
+
+void Body::SetAngularVelocity(const glm::vec3& w)
+{
+	angularVelocity = w;
+}
+
+glm::vec3 Body::GetAngularVelocity() const
+{
+	return angularVelocity;
+}
+
+const glm::vec3 Body::LocalToGlobalVec(const glm::vec3& v) const
+{
+	return R * v;
+}
+
+const glm::vec3 Body::GlobalToLocalVec(const glm::vec3& v) const
+{
+	return glm::transpose(R) * v;
+}
+
+const glm::vec3 Body::LocalToGlobalPoint(const glm::vec3& p) const
+{
+	return position + R * p;
+}
+
+const glm::vec3 Body::GlobalToLocalPoint(const glm::vec3& p) const
+{
+	return glm::transpose(R) * (p - position);
+}
+
+const glm::vec3 Body::LocalToLocalVec(Body* A, const glm::vec3& v) const
+{
+	return GlobalToLocalVec(A->LocalToGlobalVec(v));
+}
+
+const glm::vec3 Body::LocaltoLocalPoint(Body* A, const glm::vec3& p) const
+{
+	return GlobalToLocalPoint(A->LocalToGlobalPoint(p));
+}
+
+void Body::AddCollider(Collider* collider)
+{
+	collider->SetBody(this);
+
+	if (invMass == 0) return;
+
+	colliders.push_back(collider);
+
+	localCentroid = glm::vec3(0.0f);
+	invMass = 0.0f;
+
+	collider->CalculateMass();
+
+	float mass = 0.0f;		// mass of the body
+
+	for (Collider* c : colliders)
 	{
-		if (m == 0)	// static body
-			invMass = 0;
-		else
-			invMass = 1.0f / m;
+		mass += c->GetMass();
+
+		localCentroid += c->GetMass() * c->GetCentroid();
 	}
 
-	float Body::GetMass() const
-	{
-		if (invMass == 0)
-			return 0;
+	assert(mass != 0);
 
-		return 1.0f / invMass;
+	invMass = 1.0f / mass;
+
+	localCentroid *= invMass;
+	centroid = LocalToGlobalPoint(localCentroid);
+
+	glm::mat3 inertiaLocal(0);
+	for (Collider* c : colliders)
+	{
+		glm::vec3 r = localCentroid - c->GetCentroid();
+		float rDotr = glm::dot(r, r);
+		glm::mat3 rOutr = glm::outerProduct(r, r);
+
+		// Parallel axis theorem
+		// Accumulate local inertia tensors
+		inertiaLocal += c->GetInertia() + c->GetMass() * (rDotr * glm::mat3(1.0) - rOutr);
 	}
 
-	void Body::SetInvMass(const float im)
-	{
-		invMass = im;
-	}
+	localInvInertia = glm::inverse(inertiaLocal);
+}
 
-	float Body::GetInvMass() const
-	{
-		return invMass;
-	}
+void Body::ApplyForce(const glm::vec3& force)
+{
+	forceSum += force;
+}
 
-	void Body::SetInertia(const glm::mat3& inertia)
-	{
-		localInvInertia = glm::inverse(inertia);
-	}
+void Body::ApplyForce(const glm::vec3& force, const glm::vec3& p)
+{
+	forceSum += force;
+	torqueSum += glm::cross(p - centroid, force);
+}
 
-	glm::mat3 Body::GetInertia() const
-	{
-		return invInertia;
-	}
+void Body::Update(const float dt)
+{
+	if (invMass == 0.0)
+		return;
 
-	void Body::SetDensity(const float d)
-	{
-		density = d;
-	}
+	velocity += invMass * forceSum * dt;
+	angularVelocity += invInertia * torqueSum * dt;
 
-	float Body::GetDensity() const
-	{
-		return density;
-	}
+	forceSum = glm::vec3(0);
+	torqueSum = glm::vec3(0);
 
-	void Body::SetRestitution(const float e)
-	{
-		restitution = e;
-	}
+	centroid += velocity * dt;
+	orientation += 0.5f * glm::quat(0, angularVelocity) * orientation * dt;
 
-	float Body::GetRestitution() const
-	{
-		return restitution;
-	}
+	orientation = glm::normalize(orientation);
+	R = glm::toMat3(orientation);
 
-	void Body::SetFriction(const float u)
-	{
-		friction = u;
-	}
+	invInertia = glm::transpose(R) * localInvInertia * R;
 
-	float Body::GetFriction() const
-	{
-		return friction;
-	}
-
-	void Body::SetPosition(const glm::vec3& pos)
-	{
-		position = pos;
-	}
-
-	glm::vec3 Body::GetPosition() const
-	{
-		return position;
-	}
-
-	void Body::SetOrientation(const glm::quat& o)
-	{
-		orientation = glm::normalize(o);
-	}
-
-	glm::quat Body::GetOrientation() const
-	{
-		return orientation;
-	}
-
-	void Body::SetVelocity(const glm::vec3& vel)
-	{
-		velocity = vel;
-	}
-
-	glm::vec3 Body::GetVelocity() const
-	{
-		return velocity;
-	}
-
-	void Body::SetAngularVelocity(const glm::vec3& w)
-	{
-		angularVelocity = w;
-	}
-
-	glm::vec3 Body::GetAngularVelocity() const
-	{
-		return angularVelocity;
-	}
-
-	const glm::vec3 Body::LocalToGlobalVec(const glm::vec3& v) const
-	{
-		return R * v;
-	}
-
-	const glm::vec3 Body::GlobalToLocalVec(const glm::vec3& v) const
-	{
-		return glm::transpose(R) * v;
-	}
-
-	const glm::vec3 Body::LocalToGlobalPoint(const glm::vec3& p) const
-	{
-		return position + R * p;
-	}
-
-	const glm::vec3 Body::GlobalToLocalPoint(const glm::vec3& p) const
-	{
-		return glm::transpose(R) * (p - position);
-	}
-
-	const glm::vec3 Body::LocalToLocalVec(Body* A, const glm::vec3& v) const
-	{
-		return GlobalToLocalVec(A->LocalToGlobalVec(v));
-	}
-
-	const glm::vec3 Body::LocaltoLocalPoint(Body* A, const glm::vec3& p) const
-	{
-		return GlobalToLocalPoint(A->LocalToGlobalPoint(p));
-	}
-
-	void Body::AddCollider(Collider* collider)
-	{
-		collider->SetBody(this);
-
-		if (invMass == 0) return;
-
-		colliders.push_back(collider);
-
-		localCentroid = glm::vec3(0.0f);
-		invMass = 0.0f;
-
-		collider->CalculateMass();
-
-		float mass = 0.0f;		// mass of the body
-
-		for (Collider* c : colliders)
-		{
-			mass += c->GetMass();
-
-			localCentroid += c->GetMass() * c->GetCentroid();
-		}
-
-		assert(mass != 0);
-
-		invMass = 1.0f / mass;
-
-		localCentroid *= invMass;
-		centroid = LocalToGlobalPoint(localCentroid);
-
-		glm::mat3 inertiaLocal(0);
-		for (Collider* c : colliders)
-		{
-			glm::vec3 r = localCentroid - c->GetCentroid();
-			float rDotr = glm::dot(r, r);
-			glm::mat3 rOutr = glm::outerProduct(r, r);
-
-			// Parallel axis theorem
-			// Accumulate local inertia tensors
-			inertiaLocal += c->GetInertia() + c->GetMass() * (rDotr * glm::mat3(1.0) - rOutr);
-		}
-
-		localInvInertia = glm::inverse(inertiaLocal);
-	}
-
-	void Body::ApplyForce(const glm::vec3& force)
-	{
-		forceSum += force;
-	}
-
-	void Body::ApplyForce(const glm::vec3& force, const glm::vec3& p)
-	{
-		forceSum += force;
-		torqueSum += glm::cross(p - centroid, force);
-	}
-
-	void Body::Update(const float dt)
-	{
-		if (invMass == 0.0)
-			return;
-
-		velocity += invMass * forceSum * dt;
-		angularVelocity += invInertia * torqueSum * dt;
-
-		forceSum = glm::vec3(0);
-		torqueSum = glm::vec3(0);
-
-		centroid += velocity * dt;
-		orientation += 0.5f * glm::quat(0, angularVelocity) * orientation * dt;
-
-		orientation = glm::normalize(orientation);
-		R = glm::toMat3(orientation);
-
-		invInertia = glm::transpose(R) * localInvInertia * R;
-
-		position = centroid - LocalToGlobalVec(localCentroid);
-	}
+	position = centroid - LocalToGlobalVec(localCentroid);
 }

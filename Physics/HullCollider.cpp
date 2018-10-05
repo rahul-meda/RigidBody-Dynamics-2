@@ -4,173 +4,260 @@
 #include "Camera.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+#include "Line.h"
 
-namespace Physics
+HullCollider::HullCollider(const HMesh& mesh)
 {
-	HullCollider::HullCollider(const Geometry::HMesh& mesh)
+	shape = Hull;
+
+	vertices = std::vector<HVertex*>(mesh.vertices.size(), nullptr);
+	edges = std::vector<HEdge*>(mesh.edges.size(), nullptr);
+	faces = std::vector<HFace*>(mesh.faces.size(), nullptr);
+
+	for (auto mVert : mesh.vertices)
 	{
-		shape = Hull;
-		vertices = mesh.vertices;
-		edges = mesh.edges;
-		faces = mesh.faces;
+		HVertex* v = new HVertex();
+		v->id = mVert->id;
+		v->position = mVert->position;
+		v->edge = nullptr;
+		vertices[mVert->id - 1] = v;
 	}
 
-	std::vector<Geometry::HVertex*>& HullCollider::GetVertices()
+	for (auto mFace : mesh.faces)
 	{
-		return vertices;
+		HFace* f = new HFace();
+		f->id = mFace->id;
+		f->normal = mFace->normal;
+		f->edge = nullptr;
+		faces[mFace->id - 1] = f;
 	}
 
-	std::vector<Geometry::HEdge*>& HullCollider::GetEdges()
+	for (auto mEdge : mesh.edges)
 	{
-		return edges;
+		HEdge* e = new HEdge();
+		e->id = mEdge->id;
+		e->duplicate = mEdge->duplicate;
+		e->tail = vertices[mEdge->tail->id - 1];
+		if (e->tail->edge == nullptr)
+			e->tail->edge = e;
+
+		e->face = faces[mEdge->face->id - 1];
+		edges[mEdge->id - 1] = e;
 	}
 
-	std::vector<Geometry::HFace*>& HullCollider::GetFaces()
+	for (auto mEdge : mesh.edges)
 	{
-		return faces;
-	}
-
-	int HullCollider::GetVertexCount() const
-	{
-		return vertices.size();
-	}
-
-	int HullCollider::GetEdgeCount() const
-	{
-		return edges.size()/2;
-	}
-
-	int HullCollider::GetFaceCount() const
-	{
-		return faces.size();
-	}
-
-	Geometry::HVertex* HullCollider::GetVertex(int i) const
-	{
-		return vertices[i];
-	}
-
-	Geometry::HEdge* HullCollider::GetEdge(int i) const
-	{
-		return edges[i];
-	}
-
-	Geometry::HFace* HullCollider::GetFace(int i) const
-	{
-		return faces[i];
-	}
-
-	void HullCollider::SetScale(const glm::vec3 s)
-	{
-		scale = s;
-		for (auto v : vertices)
+		edges[mEdge->id - 1]->next = edges[mEdge->next->id - 1];
+		if (mEdge->twin != nullptr)
 		{
-			v->position.x *= scale.x;
-			v->position.y *= scale.y;
-			v->position.z *= scale.z;
+			edges[mEdge->id - 1]->twin = edges[mEdge->twin->id - 1];
 		}
 	}
 
-	void HullCollider::CalculateMass()
+	for (auto mFace : mesh.faces)
 	{
-		glm::vec3 diag(0.0f);
-		glm::vec3 offDiag(0.0f);
-		float volume = 0.0f;
-		glm::vec3 localCentroid;
+		faces[mFace->id - 1]->edge = edges[mFace->edge->id - 1];
+		faces[mFace->id - 1]->normal = glm::cross(faces[mFace->id - 1]->edge->GetDirection(), faces[mFace->id - 1]->edge->next->GetDirection());
+		faces[mFace->id - 1]->normal = glm::normalize(faces[mFace->id - 1]->normal);
+	}
 
-		for (int i = 0; i < faces.size(); i++)
+	// arrange edges such that first half are edges, 
+	// and next half are twins
+	std::vector<HEdge*> e1, e2;
+	for (HEdge* e : edges)
+	{
+		if (!(e->duplicate))
+			e1.push_back(e);
+		else
+			e2.push_back(e);
+	}
+	edges.clear();
+	for (HEdge* e : e1)
+		edges.push_back(e);
+	for (HEdge* e : e2)
+		edges.push_back(e);
+}
+
+std::vector<HVertex*>& HullCollider::GetVertices()
+{
+	return vertices;
+}
+
+std::vector<HEdge*>& HullCollider::GetEdges()
+{
+	return edges;
+}
+
+std::vector<HFace*>& HullCollider::GetFaces()
+{
+	return faces;
+}
+
+int HullCollider::GetVertexCount() const
+{
+	return vertices.size();
+}
+
+int HullCollider::GetEdgeCount() const
+{
+	return edges.size() / 2;
+}
+
+int HullCollider::GetFaceCount() const
+{
+	return faces.size();
+}
+
+HVertex* HullCollider::GetVertex(int i) const
+{
+	return vertices[i];
+}
+
+HEdge* HullCollider::GetEdge(int i) const
+{
+	return edges[i];
+}
+
+HFace* HullCollider::GetFace(int i) const
+{
+	return faces[i];
+}
+
+void HullCollider::SetScale(const glm::vec3 s)
+{
+	scale = s;
+	for (auto v : vertices)
+	{
+		v->position.x *= scale.x;
+		v->position.y *= scale.y;
+		v->position.z *= scale.z;
+	}
+}
+
+void HullCollider::CalculateMass()
+{
+	glm::vec3 diag(0.0f);
+	glm::vec3 offDiag(0.0f);
+	float volume = 0.0f;
+	glm::vec3 localCentroid;
+
+	for (int i = 0; i < faces.size(); i++)
+	{
+		auto start = faces[i]->edge;
+		auto middle = start->next;
+		auto last = middle->next;
+
+		while (start != last)
 		{
-			auto start = faces[i]->edge;
-			auto middle = start->next;
-			auto last = middle->next;
+			glm::vec3 u = start->tail->position;
+			glm::vec3 v = middle->tail->position;
+			glm::vec3 w = last->tail->position;
 
-			while (start != last)
+			float currentVolume = glm::dot(u, glm::cross(v, w));
+			volume += currentVolume;
+			localCentroid += (u + v + w) * currentVolume;
+
+			for (int j = 0; j < 3; ++j)
 			{
-				glm::vec3 u = start->tail->position;
-				glm::vec3 v = middle->tail->position;
-				glm::vec3 w = last->tail->position;
+				int j1 = (j + 1) % 3;
+				int j2 = (j + 2) % 3;
 
-				float currentVolume = glm::dot(u, glm::cross(v, w));
-				volume += currentVolume;
-				localCentroid += (u + v + w) * currentVolume;
+				diag[j] += (
+					u[j] * v[j] + v[j] * w[j] + w[j] * u[j] +
+					u[j] * u[j] + v[j] * v[j] + w[j] * w[j]) * currentVolume;
 
-				for (int j = 0; j < 3; ++j)
-				{
-					int j1 = (j + 1) % 3;
-					int j2 = (j + 2) % 3;
-
-					diag[j] += (
-						u[j] * v[j] + v[j] * w[j] + w[j] * u[j] +
-						u[j] * u[j] + v[j] * v[j] + w[j] * w[j]) * currentVolume;
-
-					offDiag[j] += (
-						u[j1] * v[j2] + v[j1] * w[j2] + w[j1] * u[j2] +
-						u[j1] * w[j2] + v[j1] * u[j2] + w[j1] * v[j2] +
-						u[j1] * u[j2] * 2.0f + v[j1] * v[j2] * 2.0f + w[j1] * w[j2] * 2.0f) * currentVolume;
-				}
-
-				middle = last;
-				last = last->next;
+				offDiag[j] += (
+					u[j1] * v[j2] + v[j1] * w[j2] + w[j1] * u[j2] +
+					u[j1] * w[j2] + v[j1] * u[j2] + w[j1] * v[j2] +
+					u[j1] * u[j2] * 2.0f + v[j1] * v[j2] * 2.0f + w[j1] * w[j2] * 2.0f) * currentVolume;
 			}
+
+			middle = last;
+			last = last->next;
 		}
-
-		localCentroid /= (volume * 4.0f);
-		glm::vec3 globalCentroid = body->LocalToGlobalPoint(position) + body->LocalToGlobalVec(localCentroid);
-		centroid = body->GlobalToLocalPoint(globalCentroid);
-
-		volume *= (1.0f / 6.0f);
-		diag /= volume * 60.0f;
-		offDiag /= volume * 120.0f;
-		mass = body->GetDensity() * volume;
-
-		inertia = glm::mat3(diag.y + diag.z, -offDiag.z     , -offDiag.y,
-							-offDiag.z     , diag.x + diag.z, -offDiag.x,
-							-offDiag.y     , -offDiag.x     , diag.x + diag.y);
-
-		inertia *= mass;
 	}
 
-	// To Do : Hill Climbing
-	int HullCollider::GetSupport(const glm::vec3& dir) const
-	{
-		float dot = 0.0f;
-		float maxDot = FLT_MIN;
-		int index = -1;
+	localCentroid /= (volume * 4.0f);
+	glm::vec3 globalCentroid = body->LocalToGlobalPoint(position) + body->LocalToGlobalVec(localCentroid);
+	centroid = body->GlobalToLocalPoint(globalCentroid);
 
-		for (int i = 0; i < vertices.size(); i++)
+	volume *= (1.0f / 6.0f);
+	diag /= volume * 60.0f;
+	offDiag /= volume * 120.0f;
+	mass = body->GetDensity() * volume;
+
+	inertia = glm::mat3(diag.y + diag.z, -offDiag.z, -offDiag.y,
+		-offDiag.z, diag.x + diag.z, -offDiag.x,
+		-offDiag.y, -offDiag.x, diag.x + diag.y);
+
+	inertia *= mass;
+}
+
+// To Do : Hill Climbing
+int HullCollider::GetSupport(const glm::vec3& dir) const
+{
+	float dot = 0.0f;
+	float maxDot = -FLT_MAX;
+	int index = -1;
+
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		dot = glm::dot(vertices[i]->position, dir);
+		if (dot > maxDot)
 		{
-			dot = glm::dot(vertices[i]->position, dir);
-			if (dot > maxDot)
-			{
-				maxDot = dot;
-				index = i;
-			}
+			maxDot = dot;
+			index = i;
 		}
-
-		return index;
 	}
 
-	void HullCollider::SetModel(Graphics::Model* model)
+	return index;
+}
+
+void HullCollider::SetModel(Model* model)
+{
+	poly = static_cast<Poly*>(model);
+}
+
+void HullCollider::Render()
+{
+	static glm::mat4 T(1), R(1), S(1), M(1), V(1), P(1), VP(1), MVP(1);
+	V = Camera::GetInstance().GetViewMatrix();
+	P = Camera::GetInstance().GetProjectionMatrix();
+
+	T = glm::translate(body->LocalToGlobalPoint(position));
+	R = glm::toMat4(body->GetOrientation());
+	S = glm::scale(scale);
+	M = T * R * S;
+	VP = P * V;
+	MVP = VP * M;
+	poly->SetMVP(MVP);
+	poly->SetColor(color);
+	poly->Render();
+
+	poly->GetFrame()->SetMVP(MVP);
+	poly->GetFrame()->Render();
+
+	// face normals
+	/*for (HFace* f : faces)
 	{
-		poly = static_cast<Graphics::Poly*>(model);
-	}
+	glm::vec3 c(0);
+	int n = 0;
 
-	void HullCollider::Render()
-	{
-		static glm::mat4 T(1), R(1), S(1), M(1), V(1), P(1), MVP(1);
-		V = Graphics::Camera::GetInstance().GetViewMatrix();
-		P = Graphics::Camera::GetInstance().GetProjectionMatrix();
+	HEdge* e = f->edge;
+	do {
+	c += e->tail->position;
+	n++;
+	e = e->next;
+	} while (e != f->edge);
+	c /= n;
+	c = body->LocalToGlobalPoint(c);
 
-		T = glm::translate(body->LocalToGlobalPoint(position));
-		R = glm::toMat4(body->GetOrientation());
-		S = glm::scale(scale);
-		M = T * R * S;
-		MVP = P * V * M;
-		poly->SetMVP(MVP);
-		poly->SetColor(color);
-		poly->Render();
-
-		poly->GetFrame()->SetMVP(MVP);
-		poly->GetFrame()->Render();
-	}
+	std::vector<glm::vec3> verts = { c, c + 2.0f*body->LocalToGlobalVec(f->normal) };
+	std::vector<int> ids = {0, 1};
+	Line* line = new Line(verts, ids);
+	line->SetMVP(VP);
+	line->SetColor(glm::vec3(0,1,0));
+	line->Render();
+	delete line;
+	}*/
 }

@@ -6,61 +6,61 @@
 #include <vector>
 #include "Body.h"
 #include "Collider.h"
+#include "Manifold.h"
 
-namespace Simulation
+class Simulation
 {
-	class Simulation
-	{
-	protected:
-		// window dimensions
-		int width;
-		int height;
+protected:
+	// window dimensions
+	int width;
+	int height;
 
-		// camera transformation
-		float yaw;
-		float pitch;
+	// camera transformation
+	float yaw;
+	float pitch;
 
-		// mouse co-ordinates
-		float mouseX;
-		float mouseY;
+	// mouse co-ordinates
+	float mouseX;
+	float mouseY;
 
-		// for panning the scene on corner scroll
-		bool panLeft, panRight, panTop, panBot;
+	// for panning the scene on corner scroll
+	bool panLeft, panRight, panTop, panBot;
 
-		// to check for first mouse callback
-		bool firstMouseCB;
+	// to check for first mouse callback
+	bool firstMouseCB;
 
-		// store the state of pressed keys
-		bool keys[1024];
+	// store the state of pressed keys
+	bool keys[1024];
 
-		// toggle drawing wire-frame mode
-		bool debugDraw;
+	// toggle drawing wire-frame mode
+	bool debugDraw;
 
-		bool pauseStep;
-		bool advanceStep;
+	bool pauseStep;
+	bool advanceStep;
 
-		std::vector<Physics::Body> bodies;
-		std::vector<Physics::Collider*> colliders;
+	std::vector<Body> bodies;
+	std::vector<Collider*> colliders;
+	std::vector<Manifold> contacts;
 
-	public:
-		Simulation();
+	Model* boxModel;
+public:
+	Simulation();
 
-		~Simulation();
+	~Simulation();
 
-		virtual void OnInit(GLFWwindow* window);
+	virtual void OnInit(GLFWwindow* window);
 
-		void OnWindowResize(GLFWwindow* window, int width, int height);
+	void OnWindowResize(GLFWwindow* window, int width, int height);
 
-		void OnMouseMove(GLFWwindow* window, double x, double y);
+	void OnMouseMove(GLFWwindow* window, double x, double y);
 
-		void OnMouseScroll(GLFWwindow* window, double dx, double dy);
+	void OnMouseScroll(GLFWwindow* window, double dx, double dy);
 
-		void OnMouseButton(GLFWwindow* window, int button, int action, int mods);
+	void OnMouseButton(GLFWwindow* window, int button, int action, int mods);
 
-		virtual void OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods);
+	virtual void OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods);
 
-		void Step(const float dt);
+	void Step(const float dt);
 
-		void Update();
-	};
-}
+	void Update();
+};

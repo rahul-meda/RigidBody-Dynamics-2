@@ -3,16 +3,13 @@
 
 #include "Simulation.h"
 
-namespace Simulation
+class ParserTest : public Simulation
 {
-	class ParserTest : public Simulation
-	{
-	public:
-		static ParserTest& GetInstance();
+public:
+	static ParserTest& GetInstance();
 
-		void OnInit(GLFWwindow* window);
+	void OnInit(GLFWwindow* window);
 
-	private:
-		ParserTest() {};
-	};
-}
+private:
+	ParserTest() {};
+};
