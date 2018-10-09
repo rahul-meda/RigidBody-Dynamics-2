@@ -6,17 +6,23 @@
 #define POSITIONSLOP 0.005f
 
 Contact::Contact(Body* A, Body* B, const glm::vec3& position, const glm::vec3& normal, const float penetration)
-	: A(A), B(B), position(position), normal(normal), penetration(penetration),
-	impulseSumN(0.0f), impulseSumT1(0.0f), impulseSumT2(0.0f)
+	: A(A), B(B), position(position), normal(normal), penetration(penetration), impulseSumN(0.0f)
 {
-	ComputeBasis(normal, tangent1, tangent2);
+	ComputeBasis(normal, tangent[0], tangent[1]);
 
 	rA = position - A->GetCentroid();
 	rB = position - B->GetCentroid();
 
-	CalculateJacobian();
+	CalculateJacobian(JN, normal);
 	CalculateBias();
-	effMass = CalculateEffectiveMass(J, A, B);
+	kn = CalculateEffectiveMass(JN, A, B);
+
+	for (int i = 0; i < 2; i++)
+	{
+		impulseSumT[i] = 0.0f;
+		CalculateJacobian(JT[i], tangent[i]);
+		kt[i] = CalculateEffectiveMass(JT[i], A, B);
+	}
 }
 
 float Contact::CalculateSeparatingVelocity() const
@@ -30,9 +36,9 @@ float Contact::CalculateSeparatingVelocity() const
 	return glm::dot((vB - vA), normal);
 }
 
-void Contact::CalculateJacobian()
+void Contact::CalculateJacobian(Jacobian& J, const glm::vec3& axis)
 {
-	J = Jacobian(-normal, -glm::cross(rA, normal), normal, glm::cross(rB, normal));
+	J = Jacobian(-axis, -glm::cross(rA, axis), axis, glm::cross(rB, axis));
 }
 
 void Contact::CalculateBias()
@@ -46,21 +52,40 @@ void Contact::CalculateBias()
 
 void Contact::SolveVelocities(Velocity& vA, Velocity& vB, const float dt = (1.0f/60.0f))
 {
-	float lambda = CalculateLagrangian(J, vA, vB, effMass, bias);
+	float lambda, oldImpulse;
+	float uf = (A->GetFriction() + B->GetFriction()) * 0.5f;
+	float maxFriction;
 
-	float oldImpulse = impulseSumN;
+	lambda = CalculateLagrangian(JN, vA, vB, kn, bias);
+
+	oldImpulse = impulseSumN;
 	impulseSumN = glm::max(0.0f, impulseSumN + lambda);
 	lambda = impulseSumN - oldImpulse;
 
-	vA.v += lambda * J.L1 * A->GetInvMass();
-	vA.w += lambda * J.A1 * A->GetInvInertia();
-	vB.v += lambda * J.L2 * B->GetInvMass();
-	vB.w += lambda * J.A2 * B->GetInvInertia();
+	vA.v += lambda * JN.L1 * A->GetInvMass();
+	vA.w += lambda * JN.A1 * A->GetInvInertia();
+	vB.v += lambda * JN.L2 * B->GetInvMass();
+	vB.w += lambda * JN.A2 * B->GetInvInertia();
+
+	for (int i = 0; i < 2; i++)
+	{
+		lambda = CalculateLagrangian(JT[i], vA, vB, kt[i], 0.0f);
+
+		oldImpulse = impulseSumT[i];
+		maxFriction = uf * impulseSumN;
+		impulseSumT[i] = glm::clamp(impulseSumT[i] + lambda, -maxFriction, maxFriction);
+		lambda = impulseSumT[i] - oldImpulse;
+
+		vA.v += lambda * JT[i].L1 * A->GetInvMass();
+		vA.w += lambda * JT[i].A1 * A->GetInvInertia();
+		vB.v += lambda * JT[i].L2 * B->GetInvMass();
+		vB.w += lambda * JT[i].A2 * B->GetInvInertia();
+	}
 }
 
 void Contact::SolvePositions(Position& pA, Position& pB)
 {
-	float K = CalculateEffectiveMass(J, A, B);
+	float K = CalculateEffectiveMass(JN, A, B);
 	float C = -BAUMGARTE * (glm::max(penetration - POSITIONSLOP, 0.0f));
 	float lambda = K > 0.0f ? -C / K : 0.0f;
 	glm::vec3 P = lambda * normal;

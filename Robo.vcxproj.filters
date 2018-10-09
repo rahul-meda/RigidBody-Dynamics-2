@@ -81,6 +81,9 @@
     <ClInclude Include="Physics\ConstraintCommon.h">
       <Filter>Physics\Constraints</Filter>
     </ClInclude>
+    <ClInclude Include="Simulation\FrictionTest.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
@@ -135,6 +138,9 @@
     </ClCompile>
     <ClCompile Include="Physics\Contact.cpp">
       <Filter>Physics\Constraints</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\FrictionTest.cpp">
+      <Filter>Simulation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

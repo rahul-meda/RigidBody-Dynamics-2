@@ -12,7 +12,7 @@ Body::Body()
 	invInertia(0),
 	density(1.0f),
 	restitution(0.3f),
-	friction(0.7f),
+	friction(0.2f),
 	position(0),
 	orientation(1, 0, 0, 0),
 	R(1),

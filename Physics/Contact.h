@@ -22,33 +22,33 @@ private:
 
 	glm::vec3 position;		// the contact point in world space
 	glm::vec3 normal;		// the directon in which the colliders must be spearated (by convention always from A to B)
-	glm::vec3 tangent1;		// mutually perendicular directions for friction
-	glm::vec3 tangent2;		// forming an othonormal basis with the contact normal
+	glm::vec3 tangent[2];		// mutually perendicular directions for friction
 	float penetration;		// the amount of overlap b/w the colliders
 
 	// for clamping the lagrangian
 	float impulseSumN;
-	float impulseSumT1;
-	float impulseSumT2;
+	float impulseSumT[2];
 
 	// vectors from each body's centroid to the contact point
 	glm::vec3 rA;
 	glm::vec3 rB;
 
-	Jacobian J;
+	Jacobian JN;
+	Jacobian JT[2];
 
 	// Bias is the "work" term in the velocity constraint equation
 	// Accounts for position drift, and bounce(restitution)
 	float bias;				
 
-	float effMass;
+	float kn;		// effective mass for normal impulse
+	float kt[2];	// effective mass for tangent impulse
 
 private:
 	// Projection of relative velocity along the normal 
 	float CalculateSeparatingVelocity() const;
 
-	// Calculates the Jacobian for this contact
-	void CalculateJacobian();
+	// Calculates the Jacobian for the normal/tangent part
+	void CalculateJacobian(Jacobian& J, const glm::vec3& axis);
 
 	void CalculateBias();
 
