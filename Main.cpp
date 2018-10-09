@@ -41,9 +41,9 @@ int main()
 	}
 
 	// Init window
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Nitro", nullptr, nullptr);
-	//GLFWwindow* window = glfwCreateWindow(1920, 1080, "Nitro", nullptr, nullptr);
-	//GLFWwindow* window = glfwCreateWindow(1920, 1080, "Nitro", glfwGetPrimaryMonitor(), nullptr);
+	GLFWwindow* window = glfwCreateWindow(800, 600, "Combo", nullptr, nullptr);
+	//GLFWwindow* window = glfwCreateWindow(1920, 1080, "Combo", nullptr, nullptr);
+	//GLFWwindow* window = glfwCreateWindow(1920, 1080, "Combo", glfwGetPrimaryMonitor(), nullptr);
 	if (window == nullptr)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;

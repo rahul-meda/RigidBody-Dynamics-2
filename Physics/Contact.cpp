@@ -2,6 +2,8 @@
 #include "Contact.h"
 
 #define BAUMGARTE 0.2f
+#define VELOCITYSLOP 0.5f
+#define POSITIONSLOP 0.005f
 
 Contact::Contact(Body* A, Body* B, const glm::vec3& position, const glm::vec3& normal, const float penetration)
 	: A(A), B(B), position(position), normal(normal), penetration(penetration),
@@ -39,7 +41,7 @@ void Contact::CalculateBias()
 	// restitution
 	float e = (A->GetRestitution() + B->GetRestitution()) * 0.5f;
 	float vSep = CalculateSeparatingVelocity();
-	bias += e * vSep;
+	bias += e * (glm::max(vSep - VELOCITYSLOP, 0.0f));
 }
 
 void Contact::SolveVelocities(Velocity& vA, Velocity& vB, const float dt = (1.0f/60.0f))
@@ -59,7 +61,7 @@ void Contact::SolveVelocities(Velocity& vA, Velocity& vB, const float dt = (1.0f
 void Contact::SolvePositions(Position& pA, Position& pB)
 {
 	float K = CalculateEffectiveMass(J, A, B);
-	float C = -BAUMGARTE * penetration;
+	float C = -BAUMGARTE * (glm::max(penetration - POSITIONSLOP, 0.0f));
 	float lambda = K > 0.0f ? -C / K : 0.0f;
 	glm::vec3 P = lambda * normal;
 

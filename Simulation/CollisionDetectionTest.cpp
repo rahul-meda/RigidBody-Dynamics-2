@@ -46,12 +46,34 @@ void CollisionDetectionTest::OnInit(GLFWwindow* window)
 	colliders.push_back(boxCollider);
 
 	boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(0.0, 10.0, 0.0));
+	boxCollider->SetPosition(glm::vec3(0.0, 3.0, 0.0));
 	boxCollider->SetModel(boxModel);
 	boxCollider->SetScale(glm::vec3(2.0, 2.0, 2.0));
-	body.SetPosition(glm::vec3(0.0, 10.0, 0.0));
+	body.SetPosition(glm::vec3(0.0, 3.0, 0.0));
 	body.SetMass(1.0f);
-	body.SetOrientation(glm::quat(0.78, 0,0,-1));
+	body.SetOrientation(glm::quat(0.78, 0,1,0));
+	bodies.push_back(body);
+	bodies.back().AddCollider(boxCollider);
+	colliders.push_back(boxCollider);
+
+	boxCollider = new HullCollider(mesh);
+	boxCollider->SetPosition(glm::vec3(0.0, 7.0, 0.0));
+	boxCollider->SetModel(boxModel);
+	boxCollider->SetScale(glm::vec3(2.0, 2.0, 2.0));
+	body.SetPosition(glm::vec3(0.0, 7.0, 0.0));
+	body.SetMass(1.0f);
+	body.SetOrientation(glm::quat(0.78*2.0, 0, 1, 0));
+	bodies.push_back(body);
+	bodies.back().AddCollider(boxCollider);
+	colliders.push_back(boxCollider);
+
+	boxCollider = new HullCollider(mesh);
+	boxCollider->SetPosition(glm::vec3(0.0, 11.0, 0.0));
+	boxCollider->SetModel(boxModel);
+	boxCollider->SetScale(glm::vec3(2.0, 2.0, 2.0));
+	body.SetPosition(glm::vec3(0.0, 11.0, 0.0));
+	body.SetMass(1.0f);
+	body.SetOrientation(glm::quat(0.78*3.0, 0, 1, 0));
 	bodies.push_back(body);
 	bodies.back().AddCollider(boxCollider);
 	colliders.push_back(boxCollider);

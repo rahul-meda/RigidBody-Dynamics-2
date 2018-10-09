@@ -12,7 +12,7 @@
 #include "ObjParser.h"
 
 #define MOUSE_SENSITIVITY 0.1
-#define FOV 60.0f
+#define FOV 45.0
 #define MAX_BODIES 1000
 #define VELOCITY_ITERS 7
 #define POSITION_ITERS 3
@@ -36,7 +36,8 @@ void Simulation::OnInit(GLFWwindow* window)
 	glEnable(GL_DEPTH_TEST); // enables depth-testing
 	glDepthFunc(GL_LESS);    // interpret smaller values as closer
 
-	Camera::GetInstance().SetProjection(FOV, (float)width / (float)height);
+	//glViewport(0, 0, width, height);
+	Camera::GetInstance().SetProjection(45.0, (float)width / (float)height);
 	Camera::GetInstance().SetPosition(glm::vec3(0, 1, 0));
 
 	HMesh mesh;
@@ -66,7 +67,7 @@ void Simulation::OnWindowResize(GLFWwindow* window, int width, int height)
 	this->height = height;
 	glViewport(0, 0, width, height);
 
-	Camera::GetInstance().SetProjection(45.0f, (float)width / height);
+	Camera::GetInstance().SetProjection(45.0, (float)width / height);
 }
 
 void Simulation::OnMouseMove(GLFWwindow* window, double x, double y)
