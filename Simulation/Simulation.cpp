@@ -12,6 +12,10 @@
 #include "ObjParser.h"
 
 #define MOUSE_SENSITIVITY 0.1
+#define FOV 60.0f
+#define MAX_BODIES 1000
+#define VELOCITY_ITERS 7
+#define POSITION_ITERS 3
 
 Simulation::Simulation()
 	:debugDraw(false), firstMouseCB(false), pauseStep(true), advanceStep(false)
@@ -26,13 +30,13 @@ void Simulation::OnInit(GLFWwindow* window)
 	mouseX = width / 2.0f;
 	mouseY = height / 2.0f;
 
-	glClearColor(0.9, 0.9, 0.9, 0);
+	glClearColor(0.3, 0.3, 0.3, 0);
 
 	// draw the pixel only if the object is closer to the viewer
 	glEnable(GL_DEPTH_TEST); // enables depth-testing
 	glDepthFunc(GL_LESS);    // interpret smaller values as closer
 
-	Camera::GetInstance().SetProjection(45.0f, (float)width / (float)height);
+	Camera::GetInstance().SetProjection(FOV, (float)width / (float)height);
 	Camera::GetInstance().SetPosition(glm::vec3(0, 1, 0));
 
 	HMesh mesh;
@@ -53,7 +57,7 @@ void Simulation::OnInit(GLFWwindow* window)
 	// because push_back reallocates memory, and old memory locations are invalidated
 	bodies.reserve(5000);
 	colliders.reserve(5000);
-	contacts.reserve(5000);
+	manifolds.reserve(5000);
 }
 
 void Simulation::OnWindowResize(GLFWwindow* window, int width, int height)
@@ -147,12 +151,16 @@ void Simulation::OnKeyInput(GLFWwindow* window, int key, int code, int action, i
 
 void Simulation::Step(const float dt)
 {
-	for (Body& body : bodies)
+	for (int i = 0; i < bodies.size(); i++)
 	{
-		body.Update(dt);
+		bodies[i].Update(dt);
 	}
 
-	contacts.clear();
+	// To Do: Exploit frame coherence to cache contacts 
+	// instead of rebuilding them each frame
+	for (int i = 0; i < manifolds.size(); i++)
+		manifolds[i].contacts.clear();
+	manifolds.clear();
 
 	// To Do : Broadphase
 
@@ -160,7 +168,23 @@ void Simulation::Step(const float dt)
 	{
 		for (int iB = iA + 1; iB < colliders.size(); iB++)
 		{
-			DetectCollision(contacts, colliders[iA], colliders[iB]);
+			DetectCollision(manifolds, colliders[iA], colliders[iB]);
+		}
+	}
+
+	for (int i = 0; i < VELOCITY_ITERS; i++)
+	{
+		for (auto manifold : manifolds)
+		{
+			manifold.SolveVelocities();
+		}
+	}
+
+	for (int i = 0; i < POSITION_ITERS; i++)
+	{
+		for (auto manifold : manifolds)
+		{
+			manifold.SolvePositions();
 		}
 	}
 }
@@ -193,25 +217,17 @@ void Simulation::Update()
 		collider->Render();
 	}
 
-	for (auto contact : contacts)
+	for (auto m : manifolds)
 	{
-		T = glm::translate(contact.position);
-		S = glm::scale(glm::vec3(0.1f));
-		M = T * S;
-		MVP = P * V * M;
-		boxModel->SetMVP(MVP);
-		boxModel->Render();
-	}
-
-	// Debug Draw
-	if (debugDraw)
-	{
-		// wire frame mode
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	else
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		for (auto contact : m.contacts)
+		{
+			T = glm::translate(contact.GetPosition());
+			S = glm::scale(glm::vec3(0.1f));
+			M = T * S;
+			MVP = P * V * M;
+			boxModel->SetMVP(MVP);
+			boxModel->Render();
+		}
 	}
 
 	if (panLeft)

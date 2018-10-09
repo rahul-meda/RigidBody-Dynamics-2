@@ -37,19 +37,20 @@ void CollisionDetectionTest::OnInit(GLFWwindow* window)
 	boxCollider->SetPosition(glm::vec3(0));
 	boxCollider->SetModel(boxModel);
 	boxCollider->SetScale(glm::vec3(20.0, 1.0, 20.0));
-	boxCollider->SetColor(glm::vec3(0.7, 0.9, 0.88));
+	boxCollider->SetColor(glm::vec3(0.7, 0.7, 0.6));
 	Body body;
 	body.SetPosition(glm::vec3(0));
-	//body.SetMass(0.0f);
+	body.SetMass(0.0f);
 	bodies.push_back(body);
 	bodies.back().AddCollider(boxCollider);
 	colliders.push_back(boxCollider);
 
 	boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(0.0, 4.0, 0.0));
+	boxCollider->SetPosition(glm::vec3(0.0, 10.0, 0.0));
 	boxCollider->SetModel(boxModel);
 	boxCollider->SetScale(glm::vec3(2.0, 2.0, 2.0));
-	body.SetPosition(glm::vec3(0.0, 4.0, 0.0));
+	body.SetPosition(glm::vec3(0.0, 10.0, 0.0));
+	body.SetMass(1.0f);
 	body.SetOrientation(glm::quat(0.78, 0,0,-1));
 	bodies.push_back(body);
 	bodies.back().AddCollider(boxCollider);
@@ -61,9 +62,24 @@ void CollisionDetectionTest::OnKeyInput(GLFWwindow* window, int key, int code, i
 	Simulation::OnKeyInput(window, key, code, action, mods);
 
 	glm::vec3 p = bodies[1].GetPosition();
+	glm::quat o = bodies[1].GetOrientation();
+	glm::vec3 axis;
+	glm::quat dq;
 	float t = 0.1f;
 	if (keys[GLFW_KEY_DOWN])
 		bodies[1].SetPosition(p + t*glm::vec3(0, -1.0, 0));
 	if (keys[GLFW_KEY_UP])
 		bodies[1].SetPosition(p + t*glm::vec3(0, 1.0, 0));
+	if (keys[GLFW_KEY_RIGHT])
+		bodies[1].SetPosition(p + t*glm::vec3(1.0, 0, 0));
+	if (keys[GLFW_KEY_LEFT])
+		bodies[1].SetPosition(p + t*glm::vec3(-1.0, 0, 0));
+	if (keys[GLFW_KEY_X])
+	{
+		axis = glm::vec3(1,0,0);
+		dq = glm::quat(0, axis*t);
+		o += dq*o*0.5f;
+		o = glm::normalize(o);
+		bodies[1].SetOrientation(o);
+	}
 }

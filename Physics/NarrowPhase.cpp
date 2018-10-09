@@ -2,7 +2,7 @@
 #include "NarrowPhase.h"
 #include "Collider.h"
 #include "HullCollider.h"
-#include "Manifold.h"
+#include "Contact.h"
 #include "Body.h"
 #include "Geometry.h"
 
@@ -131,7 +131,7 @@ bool IsMinkowskiFace(const glm::vec3& A, const glm::vec3& B, const glm::vec3& B_
 		(CBA * BDC > 0.0f));	// hemisphere test
 }
 
-void CreateEdgeContact(std::vector<Manifold>& contacts, HullCollider* A, HullCollider*B, const EdgeQuery& query)
+void CreateEdgeContact(std::vector<Manifold>& manifolds, HullCollider* A, HullCollider*B, const EdgeQuery& query)
 {
 	HEdge* edgeA = A->GetEdge(query.edgeIndex1);
 	HEdge* edgeB = B->GetEdge(query.edgeIndex2);
@@ -158,13 +158,15 @@ void CreateEdgeContact(std::vector<Manifold>& contacts, HullCollider* A, HullCol
 	s = (b*f - c*e) / d;
 	assert((s > 0.0f) && (s < 1.0f));
 
-	glm::vec3 contact = pA + s*d1;
+	glm::vec3 pos = pA + s*d1;
 
-	Manifold m(A->GetBody(), B->GetBody(), contact, query.normal, -query.separation);
-	contacts.push_back(m);
+	Contact contact(A->GetBody(), B->GetBody(), pos, query.normal, -query.separation);
+	Manifold m;
+	m.contacts.push_back(contact);
+	manifolds.push_back(m);
 }
 
-void CreateFaceContact(std::vector<Manifold>& contacts, HullCollider* incident, HullCollider* reference, int incidentFace, int referenceFace)
+void CreateFaceContact(std::vector<Manifold>& manifolds, HullCollider* incident, HullCollider* reference, int incidentFace, int referenceFace)
 {
 	std::vector<glm::vec3> inPoly;			// the face to be clipped - vertices on reference face
 	std::vector<HalfSpace> planes;	// the clipping planes - faces represented by each edge on the incident face
@@ -233,16 +235,19 @@ void CreateFaceContact(std::vector<Manifold>& contacts, HullCollider* incident, 
 	point = reference->GetBody()->LocalToGlobalPoint(point);
 	HalfSpace refFace(normal, point);
 	float distance;
+	int count = 0;
+	Manifold m;
 
 	for (glm::vec3 v : inPoly)
 	{
 		distance = refFace.Distance(v);
 		if (distance <= EPSILON)
 		{
-			Manifold m(reference->GetBody(), incident->GetBody(), v, normal, -distance);
-			contacts.push_back(m);
+			Contact contact(reference->GetBody(), incident->GetBody(), v, normal, -distance);
+			m.contacts.push_back(contact);
 		}
 	}
+	manifolds.push_back(m);
 }
 
 int FindIncidentFace(HullCollider* incident, HullCollider* reference, int referenceFace)
@@ -265,7 +270,7 @@ int FindIncidentFace(HullCollider* incident, HullCollider* reference, int refere
 	return incidentFace;
 }
 
-void DetectHullvsHull(std::vector<Manifold>& contacts, HullCollider* A, HullCollider* B)
+void DetectHullvsHull(std::vector<Manifold>& manifolds, HullCollider* A, HullCollider* B)
 {
 	FaceQuery faceQueryA;
 	if (!QueryFaceAxes(faceQueryA, A, B))
@@ -288,7 +293,7 @@ void DetectHullvsHull(std::vector<Manifold>& contacts, HullCollider* A, HullColl
 	if (edgeQuery.separation > maxFaceSep + epsilon)
 	{
 		// edge contact
-		CreateEdgeContact(contacts, A, B, edgeQuery);
+		CreateEdgeContact(manifolds, A, B, edgeQuery);
 	}
 	else
 	{
@@ -297,17 +302,17 @@ void DetectHullvsHull(std::vector<Manifold>& contacts, HullCollider* A, HullColl
 		if (faceQueryA.separation > faceQueryB.separation + epsilon)
 		{
 			incidentFace = FindIncidentFace(B, A, faceQueryA.faceIndex);
-			CreateFaceContact(contacts, B, A, incidentFace, faceQueryA.faceIndex);
+			CreateFaceContact(manifolds, B, A, incidentFace, faceQueryA.faceIndex);
 		}
 		else
 		{
 			incidentFace = FindIncidentFace(A, B, faceQueryB.faceIndex);
-			CreateFaceContact(contacts, A, B, incidentFace, faceQueryB.faceIndex);
+			CreateFaceContact(manifolds, A, B, incidentFace, faceQueryB.faceIndex);
 		}
 	}
 }
 
-void DetectCollision(std::vector<Manifold>& contacts, Collider* A, Collider* B)
+void DetectCollision(std::vector<Manifold>& manifolds, Collider* A, Collider* B)
 {
 	switch (A->GetShape())
 	{
@@ -316,10 +321,10 @@ void DetectCollision(std::vector<Manifold>& contacts, Collider* A, Collider* B)
 		switch (B->GetShape())
 		{
 		case (Collider::Hull) :
-			DetectHullvsHull(contacts, static_cast<HullCollider*>(A), static_cast<HullCollider*>(B));
+			DetectHullvsHull(manifolds, static_cast<HullCollider*>(A), static_cast<HullCollider*>(B));
 			break;
 		}
 	}
-						  break;
+	break;
 	}
 }

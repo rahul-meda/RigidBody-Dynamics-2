@@ -4,6 +4,8 @@
 #include "Collider.h"
 #include "Body.h"
 
+#define GRAVITY 9.8f
+
 Body::Body()
 	:invMass(1.0),
 	localInvInertia(0),
@@ -51,7 +53,7 @@ void Body::SetInertia(const glm::mat3& inertia)
 	localInvInertia = glm::inverse(inertia);
 }
 
-glm::mat3 Body::GetInertia() const
+glm::mat3 Body::GetInvInertia() const
 {
 	return invInertia;
 }
@@ -84,6 +86,16 @@ void Body::SetFriction(const float u)
 float Body::GetFriction() const
 {
 	return friction;
+}
+
+void Body::SetCentroid(const glm::vec3& c)
+{
+	centroid = c;
+}
+
+glm::vec3 Body::GetCentroid() const
+{
+	return centroid;
 }
 
 void Body::SetPosition(const glm::vec3& pos)
@@ -213,24 +225,49 @@ void Body::ApplyForce(const glm::vec3& force, const glm::vec3& p)
 	torqueSum += glm::cross(p - centroid, force);
 }
 
+void Body::IntegrateVelocity(const float dt)
+{
+	invInertia = glm::transpose(R) * localInvInertia * R;
+
+	velocity += invMass * forceSum * dt;
+	velocity += GRAVITY * (glm::vec3(0, -1, 0)) * dt;
+	angularVelocity += invInertia * torqueSum * dt;
+
+	// damp velocity?
+
+	forceSum = glm::vec3(0);
+	torqueSum = glm::vec3(0);
+}
+
+void Body::IntegratePosition(const float dt)
+{
+	centroid += velocity * dt;
+	orientation += 0.5f * glm::quat(0, angularVelocity) * orientation * dt;
+
+	orientation = glm::normalize(orientation);
+	R = glm::toMat3(orientation);
+	position = centroid - LocalToGlobalVec(localCentroid);
+}
+
 void Body::Update(const float dt)
 {
 	if (invMass == 0.0)
 		return;
 
+	invInertia = glm::transpose(R) * localInvInertia * R;
+
 	velocity += invMass * forceSum * dt;
+	velocity += GRAVITY * (glm::vec3(0, -1, 0)) * dt;
 	angularVelocity += invInertia * torqueSum * dt;
 
 	forceSum = glm::vec3(0);
 	torqueSum = glm::vec3(0);
 
 	centroid += velocity * dt;
-	orientation += 0.5f * glm::quat(0, angularVelocity) * orientation * dt;
+	orientation += 0.5f * glm::quat(0.0f, angularVelocity) * orientation * dt;
 
 	orientation = glm::normalize(orientation);
 	R = glm::toMat3(orientation);
-
-	invInertia = glm::transpose(R) * localInvInertia * R;
 
 	position = centroid - LocalToGlobalVec(localCentroid);
 }

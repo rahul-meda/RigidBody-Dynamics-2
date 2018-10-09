@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <glm/glm.hpp>
-#include "Manifold.h"
+#include "Contact.h"
 #include "HullCollider.h"
 
 // detect collision b/w colliders
@@ -51,15 +51,15 @@ bool QueryEdgeAxes(EdgeQuery& query, HullCollider*A, HullCollider* B);
 // A-B is arc1(edge from hull A) and C-D is arc2(edge from hull B)
 bool IsMinkowskiFace(const glm::vec3& A, const glm::vec3& B, const glm::vec3& B_x_A, const glm::vec3& C, const glm::vec3& D, const glm::vec3& D_x_C);
 
-void CreateEdgeContact(std::vector<Manifold>& contacts, HullCollider* A, HullCollider*B, const EdgeQuery& query);
+void CreateEdgeContact(std::vector<Manifold>& manifolds, HullCollider* A, HullCollider*B, const EdgeQuery& query);
 
 // the most anti-parallel face of incident hull compared to reference face
 int FindIncidentFace(HullCollider* incident, HullCollider* reference, int referenceFace);
 
 // create contact patch by clipping incident face against reference face
 // Sutherland Hodgman - Ref: Orange book
-void CreateFaceContact(std::vector<Manifold>& contacts, HullCollider* incident, HullCollider* reference, int incidentFace, int referenceFace);
+void CreateFaceContact(std::vector<Manifold>& manifolds, HullCollider* incident, HullCollider* reference, int incidentFace, int referenceFace);
 
-void DetectHullvsHull(std::vector<Manifold>& contacts, HullCollider* A, HullCollider* B);
+void DetectHullvsHull(std::vector<Manifold>& manifolds, HullCollider* A, HullCollider* B);
 
-void DetectCollision(std::vector<Manifold>& contacts, Collider* A, Collider* B);
+void DetectCollision(std::vector<Manifold>& manifolds, Collider* A, Collider* B);

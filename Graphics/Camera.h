@@ -8,7 +8,7 @@ class Camera
 public:
 	static Camera& GetInstance();
 
-	void SetProjection(const float fov, const float aspectRatio, const float zNear = 0.1f, const float zFar = 100.0f);
+	void SetProjection(const float fov, const float aspectRatio, const float zNear = 0.1f, const float zFar = 1000.0f);
 
 	const glm::mat4 GetViewMatrix() const;
 

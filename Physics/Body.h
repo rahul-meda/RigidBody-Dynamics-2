@@ -8,6 +8,26 @@
 
 class Collider;
 
+struct Velocity
+{
+	glm::vec3 v;
+	glm::vec3 w;
+
+	Velocity(const glm::vec3& v, const glm::vec3& w)
+		: v(v), w(w)
+	{}
+};
+
+struct Position
+{
+	glm::vec3 c;
+	glm::quat q;
+
+	Position(const glm::vec3& c, const glm::quat& q)
+		: c(c), q(q)
+	{}
+};
+
 class Body
 {
 private:
@@ -43,7 +63,7 @@ public:
 	float GetInvMass() const;
 
 	void SetInertia(const glm::mat3& inertia);
-	glm::mat3 GetInertia() const;
+	glm::mat3 GetInvInertia() const;
 
 	void SetDensity(const float d);
 	float GetDensity() const;
@@ -53,6 +73,9 @@ public:
 
 	void SetFriction(const float u);
 	float GetFriction() const;
+
+	void SetCentroid(const glm::vec3& c);
+	glm::vec3 GetCentroid() const;
 
 	void SetPosition(const glm::vec3& pos);
 	glm::vec3 GetPosition() const;
@@ -85,6 +108,10 @@ public:
 
 	// apply force at a point on the body (point given in world space)
 	void ApplyForce(const glm::vec3& force, const glm::vec3& pt);
+
+	void IntegrateVelocity(const float dt);
+
+	void IntegratePosition(const float dt);
 
 	void Update(const float dt);
 };

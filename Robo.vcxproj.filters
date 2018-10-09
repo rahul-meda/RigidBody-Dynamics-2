@@ -13,6 +13,9 @@
     <Filter Include="Geometry">
       <UniqueIdentifier>{e4cc39e0-d967-41ce-b276-5a752b73ccd6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics\Constraints">
+      <UniqueIdentifier>{52cda0f0-7bd6-4be5-883d-823e1efd2fd8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\stb_image.h">
@@ -66,14 +69,17 @@
     <ClInclude Include="Physics\NarrowPhase.h">
       <Filter>Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Physics\Manifold.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="Geometry\Geometry.h">
       <Filter>Geometry</Filter>
     </ClInclude>
     <ClInclude Include="Simulation\CollisionDetectionTest.h">
       <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Contact.h">
+      <Filter>Physics\Constraints</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\ConstraintCommon.h">
+      <Filter>Physics\Constraints</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +129,12 @@
     </ClCompile>
     <ClCompile Include="Simulation\CollisionDetectionTest.cpp">
       <Filter>Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\ConstraintCommon.cpp">
+      <Filter>Physics\Constraints</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Contact.cpp">
+      <Filter>Physics\Constraints</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

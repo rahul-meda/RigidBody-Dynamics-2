@@ -96,8 +96,9 @@
     <ClInclude Include="Graphics\stb_image.h" />
     <ClInclude Include="Physics\Body.h" />
     <ClInclude Include="Physics\Collider.h" />
+    <ClInclude Include="Physics\ConstraintCommon.h" />
+    <ClInclude Include="Physics\Contact.h" />
     <ClInclude Include="Physics\HullCollider.h" />
-    <ClInclude Include="Physics\Manifold.h" />
     <ClInclude Include="Physics\NarrowPhase.h" />
     <ClInclude Include="Simulation\CollisionDetectionTest.h" />
     <ClInclude Include="Simulation\InertiaTest.h" />
@@ -117,6 +118,8 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Physics\Body.cpp" />
     <ClCompile Include="Physics\Collider.cpp" />
+    <ClCompile Include="Physics\ConstraintCommon.cpp" />
+    <ClCompile Include="Physics\Contact.cpp" />
     <ClCompile Include="Physics\HullCollider.cpp" />
     <ClCompile Include="Physics\NarrowPhase.cpp" />
     <ClCompile Include="Simulation\CollisionDetectionTest.cpp" />
