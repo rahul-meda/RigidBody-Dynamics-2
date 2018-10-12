@@ -188,6 +188,11 @@ void Simulation::Step(const float dt)
 			manifold.SolvePositions();
 		}
 	}
+
+	for (auto joint : posJoints)
+	{
+		joint.Solve();
+	}
 }
 
 void Simulation::Update()

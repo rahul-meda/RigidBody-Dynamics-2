@@ -100,10 +100,13 @@
     <ClInclude Include="Physics\Contact.h" />
     <ClInclude Include="Physics\HullCollider.h" />
     <ClInclude Include="Physics\NarrowPhase.h" />
+    <ClInclude Include="Physics\PositionJoint.h" />
     <ClInclude Include="Simulation\CollisionDetectionTest.h" />
+    <ClInclude Include="Simulation\CompositeBodyTest.h" />
     <ClInclude Include="Simulation\FrictionTest.h" />
     <ClInclude Include="Simulation\InertiaTest.h" />
     <ClInclude Include="Simulation\ParserTest.h" />
+    <ClInclude Include="Simulation\PositionJointTest.h" />
     <ClInclude Include="Simulation\ScaleTest.h" />
     <ClInclude Include="Simulation\Simulation.h" />
     <ClInclude Include="Simulation\Simulations.h" />
@@ -123,10 +126,13 @@
     <ClCompile Include="Physics\Contact.cpp" />
     <ClCompile Include="Physics\HullCollider.cpp" />
     <ClCompile Include="Physics\NarrowPhase.cpp" />
+    <ClCompile Include="Physics\PositionJoint.cpp" />
     <ClCompile Include="Simulation\CollisionDetectionTest.cpp" />
+    <ClCompile Include="Simulation\CompositeBodyTest.cpp" />
     <ClCompile Include="Simulation\FrictionTest.cpp" />
     <ClCompile Include="Simulation\InertiaTest.cpp" />
     <ClCompile Include="Simulation\ParserTest.cpp" />
+    <ClCompile Include="Simulation\PositionJointTest.cpp" />
     <ClCompile Include="Simulation\ScaleTest.cpp" />
     <ClCompile Include="Simulation\Simulation.cpp" />
   </ItemGroup>

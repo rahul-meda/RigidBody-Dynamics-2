@@ -23,6 +23,18 @@ float CalculateLagrangian(const Jacobian& J, const Velocity& A, const Velocity& 
 	return (-(JVi + bias) / effMass);
 }
 
+float CalculateLagrangian(const Jacobian& J, const Body*A, const Body* B, const float effMass, const float bias)
+{
+	float JVi;	// velocity transformed into constraint space
+
+	JVi = glm::dot(J.L1, A->GetVelocity())
+		+ glm::dot(J.A1, A->GetAngularVelocity())
+		+ glm::dot(J.L2, B->GetVelocity())
+		+ glm::dot(J.A2, B->GetAngularVelocity());
+
+	return (-(JVi + bias) / effMass);
+}
+
 void ApplyImpulse(const Jacobian& J, Body* A, Body* B, float lambda)
 {
 	glm::vec3 v1 = A->GetVelocity();

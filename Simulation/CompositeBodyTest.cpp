@@ -1,17 +1,17 @@
 
-#include "CollisionDetectionTest.h"
+#include "CompositeBodyTest.h"
 #include "ObjParser.h"
 #include "Poly.h"
 #include "HullCollider.h"
 #include "Collider.h"
 
-CollisionDetectionTest& CollisionDetectionTest::GetInstance()
+CompositeBodyTest& CompositeBodyTest::GetInstance()
 {
-	static CollisionDetectionTest instance;
+	static CompositeBodyTest instance;
 	return instance;
 }
 
-void CollisionDetectionTest::OnInit(GLFWwindow* window)
+void CompositeBodyTest::OnInit(GLFWwindow* window)
 {
 	Simulation::OnInit(window);
 
@@ -34,30 +34,36 @@ void CollisionDetectionTest::OnInit(GLFWwindow* window)
 
 	// floor
 	Collider* boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(0));
+	boxCollider->SetPosition(glm::vec3(glm::vec3(0,-5.0,0)));
 	boxCollider->SetModel(boxModel);
 	boxCollider->SetScale(glm::vec3(20.0, 1.0, 20.0));
 	boxCollider->SetColor(glm::vec3(0.7, 0.7, 0.6));
 	Body body;
-	body.SetPosition(glm::vec3(0));
+	body.SetPosition(glm::vec3(0,-5.0,0));
 	body.SetMass(0.0f);
 	bodies.push_back(body);
 	bodies.back().AddCollider(boxCollider);
 	colliders.push_back(boxCollider);
 
 	boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(0.0, 10.0, 0.0));
+	boxCollider->SetPosition(glm::vec3(-5.0,0.0,0.0));
 	boxCollider->SetModel(boxModel);
-	boxCollider->SetScale(glm::vec3(2.0, 2.0, 2.0));
-	body.SetPosition(glm::vec3(0.0, 10.0, 0.0));
+	boxCollider->SetScale(glm::vec3(1.0, 3.0, 1.0));
+	body.SetPosition(glm::vec3(-5.0,0.0, 0.0));
 	body.SetMass(1.0f);
-	body.SetOrientation(glm::quat(0.78, 0,1,0));
 	bodies.push_back(body);
 	bodies.back().AddCollider(boxCollider);
 	colliders.push_back(boxCollider);
+
+	/*boxCollider = new HullCollider(mesh);
+	boxCollider->SetPosition(glm::vec3(5.0,0.0,0.0));
+	boxCollider->SetModel(boxModel);
+	boxCollider->SetScale(glm::vec3(1.0,3.0,1.0));
+	bodies.back().AddCollider(boxCollider);
+	colliders.push_back(boxCollider);*/
 }
 
-void CollisionDetectionTest::OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods)
+void CompositeBodyTest::OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods)
 {
 	Simulation::OnKeyInput(window, key, code, action, mods);
 
@@ -71,15 +77,23 @@ void CollisionDetectionTest::OnKeyInput(GLFWwindow* window, int key, int code, i
 	if (keys[GLFW_KEY_UP])
 		bodies[1].SetPosition(p + t*glm::vec3(0, 1.0, 0));
 	if (keys[GLFW_KEY_RIGHT])
-		bodies[1].SetPosition(p + t*glm::vec3(1.0, 0, 0));
+		bodies[1].SetPosition(p + t*glm::vec3(1.0, 0.0, 0));
 	if (keys[GLFW_KEY_LEFT])
 		bodies[1].SetPosition(p + t*glm::vec3(-1.0, 0, 0));
-	if (keys[GLFW_KEY_X])
+	if (keys[GLFW_KEY_Y])
 	{
-		axis = glm::vec3(1,0,0);
+		axis = glm::vec3(0, 0, -1);
 		dq = glm::quat(0, axis*t);
 		o += dq*o*0.5f;
 		o = glm::normalize(o);
 		bodies[1].SetOrientation(o);
+	}
+	if (keys[GLFW_KEY_X])
+	{
+		bodies[1].SetAngularVelocity(glm::vec3(0,0,-1.0));
+	}
+	if (keys[GLFW_KEY_C])
+	{
+		bodies[1].SetAngularVelocity(glm::vec3(0.0));
 	}
 }

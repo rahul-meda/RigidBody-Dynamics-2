@@ -7,6 +7,7 @@
 #include "Body.h"
 #include "Collider.h"
 #include "Contact.h"
+#include "PositionJoint.h"
 
 class Simulation
 {
@@ -41,6 +42,7 @@ protected:
 	std::vector<Body> bodies;
 	std::vector<Collider*> colliders;
 	std::vector<Manifold> manifolds;
+	std::vector<PositionJoint> posJoints;
 
 	Model* boxModel;
 public:

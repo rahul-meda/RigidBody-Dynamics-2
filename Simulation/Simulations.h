@@ -7,3 +7,5 @@
 #include "InertiaTest.h"
 #include "CollisionDetectionTest.h"
 #include "FrictionTest.h"
+#include "PositionJointTest.h"
+#include "CompositeBodyTest.h"

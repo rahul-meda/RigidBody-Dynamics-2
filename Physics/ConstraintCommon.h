@@ -31,5 +31,7 @@ float CalculateEffectiveMass(const Jacobian& J, const Body* A, const Body* B);
 // Lagrangian is the impulse in constraint space to satisfy the constraint
 float CalculateLagrangian(const Jacobian& J, const Velocity& A, const Velocity& B, const float effMass, const float bias = 0);
 
+float CalculateLagrangian(const Jacobian& J, const Body*A, const Body* B, const float effMass, const float bias = 0);
+
 // Convert the lagrangian into world space and apply to the bodies
 void ApplyImpulse(const Jacobian& J, Body* A, Body* B, const float lambda);

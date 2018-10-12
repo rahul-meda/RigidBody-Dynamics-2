@@ -47,7 +47,7 @@ void Contact::CalculateBias()
 	// restitution
 	float e = (A->GetRestitution() + B->GetRestitution()) * 0.5f;
 	float vSep = CalculateSeparatingVelocity();
-	bias += e * (glm::max(vSep - VELOCITYSLOP, 0.0f));
+	bias += e * (glm::min(vSep + VELOCITYSLOP, 0.0f));
 }
 
 void Contact::SolveVelocities(Velocity& vA, Velocity& vB, const float dt = (1.0f/60.0f))
