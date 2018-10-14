@@ -44,7 +44,6 @@ protected:
 	std::vector<Manifold> manifolds;
 	std::vector<PositionJoint> posJoints;
 
-	Model* boxModel;
 public:
 	Simulation();
 

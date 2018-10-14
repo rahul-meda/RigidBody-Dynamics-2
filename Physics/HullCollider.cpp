@@ -132,6 +132,12 @@ void HullCollider::SetScale(const glm::vec3 s)
 		v->position.y *= scale.y;
 		v->position.z *= scale.z;
 	}
+	for (glm::vec3& v : modelData.vertices)
+	{
+		v.x *= s.x;
+		v.y *= s.y;
+		v.z *= s.z;
+	}
 }
 
 void HullCollider::CalculateMass()
@@ -139,7 +145,7 @@ void HullCollider::CalculateMass()
 	glm::vec3 diag(0.0f);
 	glm::vec3 offDiag(0.0f);
 	float volume = 0.0f;
-	glm::vec3 localCentroid;
+	glm::vec3 localCentroid(0.0);
 
 	for (int i = 0; i < faces.size(); i++)
 	{

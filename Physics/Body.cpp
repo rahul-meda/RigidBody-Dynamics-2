@@ -3,6 +3,9 @@
 
 #include "Collider.h"
 #include "Body.h"
+#include "Camera.h"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 
 #define GRAVITY 9.8f
 
@@ -19,7 +22,8 @@ Body::Body()
 	velocity(0),
 	angularVelocity(0),
 	forceSum(0),
-	torqueSum(0)
+	torqueSum(0),
+	color(0.4, 0.9, 0.1)
 {}
 
 void Body::SetMass(const float m)
@@ -113,6 +117,7 @@ glm::vec3 Body::GetPosition() const
 void Body::SetOrientation(const glm::quat& o)
 {
 	orientation = glm::normalize(o);
+	R = glm::mat3(orientation);
 }
 
 glm::quat Body::GetOrientation() const
@@ -138,6 +143,48 @@ void Body::SetAngularVelocity(const glm::vec3& w)
 glm::vec3 Body::GetAngularVelocity() const
 {
 	return angularVelocity;
+}
+
+void Body::SetModelData()
+{
+	std::vector<glm::vec3> vertices;
+	std::vector<int> indices;
+	std::vector<int> frameIndices;
+	int offset = 0;
+
+	for (Collider* c : colliders)
+	{
+		for (glm::vec3 v : c->GetModelData().vertices)
+		{
+			vertices.push_back(v + c->GetPosition());
+		}
+	}
+	for (Collider* c : colliders)
+	{
+		for (int i : c->GetModelData().indices)
+		{
+			indices.push_back(i + offset);
+		}
+		offset = c->GetModelData().vertices.size();
+	}
+	offset = 0;
+	for (Collider* c : colliders)
+	{
+		for (int i : c->GetModelData().frameIndices)
+		{
+			frameIndices.push_back(i + offset);
+		}
+		offset = c->GetModelData().vertices.size();
+	}
+
+	model = new Model(vertices, indices);
+	frame = new Model(vertices, frameIndices);
+	frame->SetPrimitive(GL_LINES);
+}
+
+void Body::SetColor(const glm::vec3& color)
+{
+	this->color = color;
 }
 
 const glm::vec3 Body::LocalToGlobalVec(const glm::vec3& v) const
@@ -173,10 +220,9 @@ const glm::vec3 Body::LocaltoLocalPoint(Body* A, const glm::vec3& p) const
 void Body::AddCollider(Collider* collider)
 {
 	collider->SetBody(this);
+	colliders.push_back(collider);
 
 	if (invMass == 0) return;
-
-	colliders.push_back(collider);
 
 	localCentroid = glm::vec3(0.0f);
 	invMass = 0.0f;
@@ -222,7 +268,7 @@ void Body::ApplyForce(const glm::vec3& force)
 void Body::ApplyForce(const glm::vec3& force, const glm::vec3& p)
 {
 	forceSum += force;
-	torqueSum += glm::cross(p - centroid, force);
+	torqueSum += glm::cross(LocalToGlobalPoint(p) - centroid, force);
 }
 
 void Body::IntegrateVelocity(const float dt)
@@ -270,4 +316,24 @@ void Body::Update(const float dt)
 	R = glm::toMat3(orientation);
 
 	position = centroid - LocalToGlobalVec(localCentroid);
+}
+
+void Body::Render()
+{
+	static glm::mat4 T(1), R(1), S(1), M(1), V(1), P(1), VP(1), MVP(1);
+	V = Camera::GetInstance().GetViewMatrix();
+	P = Camera::GetInstance().GetProjectionMatrix();
+
+	T = glm::translate(position);
+	R = glm::toMat4(orientation);
+	M = T * R * S;
+	VP = P * V;
+	MVP = VP * M;
+	model->SetMVP(MVP);
+	model->SetColor(color);
+	model->Render();
+
+	frame->SetMVP(MVP);
+	frame->SetColor(glm::vec3(0.9));
+	frame->Render();
 }

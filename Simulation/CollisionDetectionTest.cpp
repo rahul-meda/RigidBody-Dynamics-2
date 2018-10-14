@@ -20,36 +20,35 @@ void CollisionDetectionTest::OnInit(GLFWwindow* window)
 
 	std::vector<glm::vec3> vertices;
 	std::vector<int> indices;
+	std::vector<int> frameIndices;
 
 	for (auto vert : mesh.vertices)
 	{
 		vertices.push_back(vert->position);
 	}
 	mesh.GetTriangleIndices(indices);
-	Model* boxModel = new Poly(vertices, indices);
+	mesh.GetLineIndices(frameIndices);
 
-	indices.clear();
-	mesh.GetLineIndices(indices);
-	static_cast<Poly*>(boxModel)->SetFrame(vertices, indices);
+	ModelData boxModel(vertices, indices, frameIndices);
 
 	// floor
 	Collider* boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(0));
-	boxCollider->SetModel(boxModel);
+	boxCollider->SetPosition(glm::vec3(0, -10.0, 0));
+	boxCollider->SetModelData(boxModel);
 	boxCollider->SetScale(glm::vec3(20.0, 1.0, 20.0));
 	boxCollider->SetColor(glm::vec3(0.7, 0.7, 0.6));
 	Body body;
-	body.SetPosition(glm::vec3(0));
+	body.SetPosition(glm::vec3(0, -10.0, 0));
 	body.SetMass(0.0f);
 	bodies.push_back(body);
 	bodies.back().AddCollider(boxCollider);
 	colliders.push_back(boxCollider);
 
 	boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(0.0, 10.0, 0.0));
-	boxCollider->SetModel(boxModel);
+	boxCollider->SetPosition(glm::vec3(5.0, 0.0, 0.0));
+	boxCollider->SetModelData(boxModel);
 	boxCollider->SetScale(glm::vec3(2.0, 2.0, 2.0));
-	body.SetPosition(glm::vec3(0.0, 10.0, 0.0));
+	body.SetPosition(glm::vec3(0.0, 0.0, 0.0));
 	body.SetMass(1.0f);
 	body.SetOrientation(glm::quat(0.78, 0,1,0));
 	bodies.push_back(body);

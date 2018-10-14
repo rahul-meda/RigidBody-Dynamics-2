@@ -6,6 +6,19 @@
 
 class Body;
 
+struct ModelData
+{
+	std::vector<glm::vec3> vertices;
+	std::vector<int> indices;
+	std::vector<int> frameIndices;
+
+	ModelData(){};
+
+	ModelData(const std::vector<glm::vec3>& vertices, const std::vector<int>& indices, const std::vector<int>& frameIndices)
+		: vertices(vertices), indices(indices), frameIndices(frameIndices)
+	{}
+};
+
 class Collider
 {
 public:
@@ -27,6 +40,7 @@ protected:
 
 	Body* body;
 
+	ModelData modelData;
 	glm::vec3 color;
 public:
 	Collider()
@@ -56,6 +70,10 @@ public:
 	Body* GetBody() const { return body; };
 
 	void SetColor(const glm::vec3& c) { color = c; };
+
+	void SetModelData(const ModelData& m) { modelData = ModelData(m); };
+
+	ModelData GetModelData() const { return modelData; };
 
 	virtual void SetModel(Model* model) {};
 

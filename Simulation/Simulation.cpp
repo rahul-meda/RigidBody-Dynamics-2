@@ -100,8 +100,8 @@ void Simulation::OnMouseMove(GLFWwindow* window, double x, double y)
 	if (mouseY > height - 20) panTop = true;
 	else panTop = false;
 
-	if (pitch > 89.0f) pitch = 89.0f;
-	if (pitch < -89.0f) pitch = -89.0f;
+	//if (pitch > 89.0f) pitch = 89.0f;
+	//if (pitch < -89.0f) pitch = -89.0f;
 
 	Camera::GetInstance().Rotate(yaw, pitch, 0);
 }
@@ -218,9 +218,13 @@ void Simulation::Update()
 	glm::mat4 V = Camera::GetInstance().GetViewMatrix();
 	glm::mat4 P = Camera::GetInstance().GetProjectionMatrix();
 
-	for (auto collider : colliders)
+	/*for (auto collider : colliders)
 	{
 		collider->Render();
+	}*/
+	for (auto b : bodies)
+	{
+		b.Render();
 	}
 
 	for (auto m : manifolds)

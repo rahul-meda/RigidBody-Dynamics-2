@@ -7,7 +7,7 @@
 #define POINT_SIZE 5.0f
 
 Model::Model(const std::vector<glm::vec3>& vertices, const std::vector<int>& indices)
-	: vertices(vertices), indices(indices), color(0.4, 0.9, 0.1)
+	: vertices(vertices), indices(indices), primType(GL_TRIANGLES), color(0.4, 0.9, 0.1)
 {
 	shader.LoadFromFile(GL_VERTEX_SHADER, "Graphics/shader.vert");
 	shader.LoadFromFile(GL_FRAGMENT_SHADER, "Graphics/shader.frag");

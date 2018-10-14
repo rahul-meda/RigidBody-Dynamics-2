@@ -5,6 +5,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <vector>
+#include "Model.h"
 
 class Collider;
 
@@ -53,6 +54,10 @@ private:
 
 	std::vector<Collider*> colliders;
 
+	Model* model;
+	Model* frame;
+	glm::vec3 color;
+
 public:
 	Body();
 
@@ -89,6 +94,10 @@ public:
 	void SetAngularVelocity(const glm::vec3& w);
 	glm::vec3 GetAngularVelocity() const;
 
+	void SetModelData();
+
+	void SetColor(const glm::vec3& color);
+
 	const glm::vec3 LocalToGlobalVec(const glm::vec3& v) const;
 
 	const glm::vec3 GlobalToLocalVec(const glm::vec3& v) const;
@@ -106,7 +115,7 @@ public:
 	// apply force at c.o.m
 	void ApplyForce(const glm::vec3& force);
 
-	// apply force at a point on the body (point given in world space)
+	// apply force at a point on the body (point given in body space)
 	void ApplyForce(const glm::vec3& force, const glm::vec3& pt);
 
 	void IntegrateVelocity(const float dt);
@@ -114,4 +123,6 @@ public:
 	void IntegratePosition(const float dt);
 
 	void Update(const float dt);
+
+	void Render();
 };

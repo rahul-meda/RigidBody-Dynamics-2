@@ -20,21 +20,20 @@ void InertiaTest::OnInit(GLFWwindow* window)
 
 	std::vector<glm::vec3> vertices;
 	std::vector<int> indices;
+	std::vector<int> frameIndices;
 
 	for (auto vert : mesh.vertices)
 	{
 		vertices.push_back(vert->position);
 	}
 	mesh.GetTriangleIndices(indices);
-	Model* boxModel = new Poly(vertices, indices);
+	mesh.GetLineIndices(frameIndices);
 
-	indices.clear();
-	mesh.GetLineIndices(indices);
-	static_cast<Poly*>(boxModel)->SetFrame(vertices, indices);
+	ModelData boxModel(vertices, indices, frameIndices);
 
 	Collider* boxCollider = new HullCollider(mesh);
 	boxCollider->SetPosition(glm::vec3(0));
-	boxCollider->SetModel(boxModel);
+	boxCollider->SetModelData(boxModel);
 	boxCollider->SetScale(glm::vec3(3.0, 1.0, 2.0));
 
 	Body body;
