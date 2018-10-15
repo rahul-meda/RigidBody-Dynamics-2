@@ -8,6 +8,9 @@
 #include "Collider.h"
 #include "Contact.h"
 #include "PositionJoint.h"
+#include "MouseJoint.h"
+
+class Poly;
 
 class Simulation
 {
@@ -43,6 +46,11 @@ protected:
 	std::vector<Collider*> colliders;
 	std::vector<Manifold> manifolds;
 	std::vector<PositionJoint> posJoints;
+	
+	MouseJoint mouseJoint;
+	bool picked;
+
+	Poly* boxModel;
 
 public:
 	Simulation();

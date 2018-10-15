@@ -43,7 +43,8 @@ void PositionJointTest::OnInit(GLFWwindow* window)
 	bodies.push_back(body);
 	bodies.back().AddCollider(boxCollider);
 	colliders.push_back(boxCollider);
-	
+	bodies.back().SetModelData();
+
 	// links
 	float g = 4.0f;	// gap b/w links
 	float hg = 2.0f;
@@ -61,6 +62,7 @@ void PositionJointTest::OnInit(GLFWwindow* window)
 	bodies.push_back(body);
 	bodies.back().AddCollider(boxCollider);
 	colliders.push_back(boxCollider);
+	bodies.back().SetModelData();
 
 	PositionJoint pj(&bodies[0], &bodies[1], glm::vec3(0, -hg, 0));
 	posJoints.push_back(pj);
@@ -76,6 +78,7 @@ void PositionJointTest::OnInit(GLFWwindow* window)
 		bodies.push_back(body);
 		bodies.back().AddCollider(boxCollider);
 		colliders.push_back(boxCollider);
+		bodies.back().SetModelData();
 
 		pj = PositionJoint(&bodies[i], &bodies[i+1], glm::vec3(0, -(hg + yn*(float)i), 0));
 		posJoints.push_back(pj);

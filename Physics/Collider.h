@@ -75,11 +75,5 @@ public:
 
 	ModelData GetModelData() const { return modelData; };
 
-	virtual void SetModel(Model* model) {};
-
-	virtual void CalculateMass() {};
-
-	virtual void SetScale(const glm::vec3 s) {};
-
-	virtual void Render() {};
+	virtual void SetScale(const glm::vec3& scale) {};
 };

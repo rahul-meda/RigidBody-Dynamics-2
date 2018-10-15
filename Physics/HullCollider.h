@@ -33,7 +33,7 @@ public:
 	HEdge* GetEdge(int i) const;
 	HFace* GetFace(int i) const;
 
-	void SetScale(const glm::vec3 s);
+	void SetScale(const glm::vec3& s);
 
 	// calculaate mass and inertia from geometry data
 	void CalculateMass();

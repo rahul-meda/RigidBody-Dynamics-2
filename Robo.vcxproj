@@ -99,8 +99,10 @@
     <ClInclude Include="Physics\ConstraintCommon.h" />
     <ClInclude Include="Physics\Contact.h" />
     <ClInclude Include="Physics\HullCollider.h" />
+    <ClInclude Include="Physics\MouseJoint.h" />
     <ClInclude Include="Physics\NarrowPhase.h" />
     <ClInclude Include="Physics\PositionJoint.h" />
+    <ClInclude Include="Physics\PrimitiveQuery.h" />
     <ClInclude Include="Simulation\CollisionDetectionTest.h" />
     <ClInclude Include="Simulation\CompositeBodyTest.h" />
     <ClInclude Include="Simulation\FrictionTest.h" />
@@ -125,8 +127,10 @@
     <ClCompile Include="Physics\ConstraintCommon.cpp" />
     <ClCompile Include="Physics\Contact.cpp" />
     <ClCompile Include="Physics\HullCollider.cpp" />
+    <ClCompile Include="Physics\MouseJoint.cpp" />
     <ClCompile Include="Physics\NarrowPhase.cpp" />
     <ClCompile Include="Physics\PositionJoint.cpp" />
+    <ClCompile Include="Physics\PrimitiveQuery.cpp" />
     <ClCompile Include="Simulation\CollisionDetectionTest.cpp" />
     <ClCompile Include="Simulation\CompositeBodyTest.cpp" />
     <ClCompile Include="Simulation\FrictionTest.cpp" />

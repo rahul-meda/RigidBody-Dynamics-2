@@ -10,6 +10,7 @@
 #include "NarrowPhase.h"
 #include "Mesh.h"
 #include "ObjParser.h"
+#include "PrimitiveQuery.h"
 
 #define MOUSE_SENSITIVITY 0.1
 #define FOV 45.0
@@ -18,7 +19,7 @@
 #define POSITION_ITERS 3
 
 Simulation::Simulation()
-	:debugDraw(false), firstMouseCB(false), pauseStep(true), advanceStep(false)
+	:debugDraw(false), firstMouseCB(false), pauseStep(true), advanceStep(false), picked(false)
 {
 	panLeft = panRight = panBot = panTop = false;
 }
@@ -104,6 +105,28 @@ void Simulation::OnMouseMove(GLFWwindow* window, double x, double y)
 	//if (pitch < -89.0f) pitch = -89.0f;
 
 	Camera::GetInstance().Rotate(yaw, pitch, 0);
+
+	if (picked)
+	{
+		// read pixel depth at mouse click position - gives screen space 3D point
+		float mouseZ = 0;
+		glReadPixels(mouseX, height - mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &mouseZ);
+
+		// convert the point from screen space to world space
+		glm::vec3 sMouse = glm::vec3(mouseX, height - mouseY, mouseZ);
+		glm::mat4 MV = Camera::GetInstance().GetViewMatrix();
+		glm::mat4 P = Camera::GetInstance().GetProjectionMatrix();
+		glm::vec3 wMouse = glm::unProject(sMouse, MV, P, glm::vec4(0, 0, width, height));
+		glm::vec3 prevMouse = mouseJoint.GetMouseAnchor();
+
+		if (glm::length2(prevMouse - wMouse) > 1.0f)
+		{
+			picked = false;
+			return;
+		}
+
+		mouseJoint.SetMouseAnchor(wMouse);
+	}
 }
 
 void Simulation::OnMouseScroll(GLFWwindow* window, double dx, double dy)
@@ -112,7 +135,38 @@ void Simulation::OnMouseScroll(GLFWwindow* window, double dx, double dy)
 
 void Simulation::OnMouseButton(GLFWwindow* window, int button, int action, int mods)
 {
+	if (action == GLFW_PRESS)
+	{
+		// read pixel depth at mouse click position - gives screen space 3D point
+		float mouseZ = 0;
+		glReadPixels(mouseX, height - mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &mouseZ);
 
+		// convert the point from screen space to world space
+		glm::vec3 sMouse = glm::vec3(mouseX, height - mouseY, mouseZ);
+		glm::mat4 MV = Camera::GetInstance().GetViewMatrix();
+		glm::mat4 P = Camera::GetInstance().GetProjectionMatrix();
+		glm::vec3 wMouse = glm::unProject(sMouse, MV, P, glm::vec4(0, 0, width, height));
+
+		// check if mouse point with collider
+		for (int i = 0; i < colliders.size(); i++)
+		{
+			Collider*c = colliders[i];
+			
+			if (c->GetBody()->GetInvMass() == 0.0f)
+				continue;
+
+			if (QueryPoint(c, wMouse))
+			{
+				mouseJoint = MouseJoint(c->GetBody(), wMouse);
+				mouseJoint.SetMouseAnchor(wMouse);
+				picked = true;
+			}
+		}
+	}
+	else if (action == GLFW_RELEASE)
+	{
+		picked = false;
+	}
 }
 
 void Simulation::OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods)
@@ -193,6 +247,9 @@ void Simulation::Step(const float dt)
 	{
 		joint.Solve();
 	}
+
+	if (picked)
+		mouseJoint.Solve();
 }
 
 void Simulation::Update()
@@ -214,7 +271,7 @@ void Simulation::Update()
 	}
 
 	// Graphics update
-	glm::mat4 T(1), R(1), S(1), M(1), MVP(1);
+	static glm::mat4 T(1), R(1), S(1), M(1), MVP(1);
 	glm::mat4 V = Camera::GetInstance().GetViewMatrix();
 	glm::mat4 P = Camera::GetInstance().GetProjectionMatrix();
 

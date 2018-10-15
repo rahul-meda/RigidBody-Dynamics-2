@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+#include "HullCollider.h"
 
 #define GRAVITY 9.8f
 
@@ -227,7 +228,12 @@ void Body::AddCollider(Collider* collider)
 	localCentroid = glm::vec3(0.0f);
 	invMass = 0.0f;
 
-	collider->CalculateMass();
+	switch (collider->GetShape())
+	{
+	case (Collider::Hull) :
+		static_cast<HullCollider*>(collider)->CalculateMass();
+		break;
+	}
 
 	float mass = 0.0f;		// mass of the body
 

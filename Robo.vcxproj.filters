@@ -84,14 +84,20 @@
     <ClInclude Include="Simulation\FrictionTest.h">
       <Filter>Simulation</Filter>
     </ClInclude>
-    <ClInclude Include="Physics\PositionJoint.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="Simulation\CompositeBodyTest.h">
       <Filter>Simulation</Filter>
     </ClInclude>
     <ClInclude Include="Simulation\PositionJointTest.h">
       <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\MouseJoint.h">
+      <Filter>Physics\Constraints</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\PositionJoint.h">
+      <Filter>Physics\Constraints</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\PrimitiveQuery.h">
+      <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -151,14 +157,20 @@
     <ClCompile Include="Simulation\FrictionTest.cpp">
       <Filter>Simulation</Filter>
     </ClCompile>
-    <ClCompile Include="Physics\PositionJoint.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
     <ClCompile Include="Simulation\CompositeBodyTest.cpp">
       <Filter>Simulation</Filter>
     </ClCompile>
     <ClCompile Include="Simulation\PositionJointTest.cpp">
       <Filter>Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\PositionJoint.cpp">
+      <Filter>Physics\Constraints</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\MouseJoint.cpp">
+      <Filter>Physics\Constraints</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\PrimitiveQuery.cpp">
+      <Filter>Physics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

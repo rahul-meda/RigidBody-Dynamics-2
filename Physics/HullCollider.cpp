@@ -123,7 +123,7 @@ HFace* HullCollider::GetFace(int i) const
 	return faces[i];
 }
 
-void HullCollider::SetScale(const glm::vec3 s)
+void HullCollider::SetScale(const glm::vec3& s)
 {
 	scale = s;
 	for (auto v : vertices)
