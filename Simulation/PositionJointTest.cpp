@@ -33,17 +33,13 @@ void PositionJointTest::OnInit(GLFWwindow* window)
 
 	// ceiling
 	Collider* boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(0,1.0,0));
-	boxCollider->SetModelData(boxModel);
-	boxCollider->SetScale(glm::vec3(6.0, 1.0, 6.0));
-	boxCollider->SetColor(glm::vec3(0.7, 0.7, 0.6));
 	Body body;
 	body.SetPosition(glm::vec3(0, 1.0, 0));
 	body.SetMass(0.0f);
 	bodies.push_back(body);
 	bodies.back().AddCollider(boxCollider);
 	colliders.push_back(boxCollider);
-	bodies.back().SetModelData();
+	bodies.back().SetModelData(boxModel);
 
 	// links
 	float g = 4.0f;	// gap b/w links
@@ -54,15 +50,12 @@ void PositionJointTest::OnInit(GLFWwindow* window)
 	float yn = g + s;
 
 	boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(0, -(g + hs), 0));
-	boxCollider->SetModelData(boxModel);
-	boxCollider->SetScale(glm::vec3(2.0, 2.0, 2.0));
 	body.SetPosition(glm::vec3(0, -(g + hs), 0));
 	body.SetMass(1.0f);
 	bodies.push_back(body);
 	bodies.back().AddCollider(boxCollider);
 	colliders.push_back(boxCollider);
-	bodies.back().SetModelData();
+	bodies.back().SetModelData(boxModel);
 
 	PositionJoint pj(&bodies[0], &bodies[1], glm::vec3(0, -hg, 0));
 	posJoints.push_back(pj);
@@ -70,15 +63,12 @@ void PositionJointTest::OnInit(GLFWwindow* window)
 	for (int i = 1; i < 2; i++)
 	{
 		boxCollider = new HullCollider(mesh);
-		boxCollider->SetPosition(glm::vec3(0, -(g + hs + yn*(float)i), 0));
-		boxCollider->SetModelData(boxModel);
-		boxCollider->SetScale(glm::vec3(2.0, 2.0, 2.0));
 		body.SetPosition(glm::vec3(0, -(g + hs + yn*(float)i), 0));
 		body.SetMass(1.0f);
 		bodies.push_back(body);
 		bodies.back().AddCollider(boxCollider);
 		colliders.push_back(boxCollider);
-		bodies.back().SetModelData();
+		bodies.back().SetModelData(boxModel);
 
 		pj = PositionJoint(&bodies[i], &bodies[i+1], glm::vec3(0, -(hg + yn*(float)i), 0));
 		posJoints.push_back(pj);

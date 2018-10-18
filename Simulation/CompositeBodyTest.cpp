@@ -16,56 +16,41 @@ void CompositeBodyTest::OnInit(GLFWwindow* window)
 	Simulation::OnInit(window);
 
 	HMesh mesh;
-	ParseObj("resources/box.obj", mesh);
-
-	std::vector<glm::vec3> vertices;
-	std::vector<int> indices;
-	std::vector<int> frameIndices;
-
-	for (auto vert : mesh.vertices)
-	{
-		vertices.push_back(vert->position);
-	}
-	mesh.GetTriangleIndices(indices);
-	mesh.GetLineIndices(frameIndices);
-
-	ModelData boxModel(vertices, indices, frameIndices);
+	ModelData model;
+	Collider* collider;
+	Body body;
+	int id = 0;
 
 	// floor
-	Collider* boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(glm::vec3(0,-10.0,0)));
-	boxCollider->SetModelData(boxModel);
-	boxCollider->SetScale(glm::vec3(20.0, 1.0, 20.0));
-	boxCollider->SetColor(glm::vec3(0.7, 0.7, 0.6));
-	Body body;
+	ParseObj("resources/floor.obj", mesh);
+	mesh.GetModelData(model);
+	collider = new HullCollider(mesh);
+	body.SetModelData(model);
 	body.SetPosition(glm::vec3(0, -10.0, 0));
 	body.SetMass(0.0f);
-	//body.SetOrientation(glm::angleAxis(-glm::pi<float>() / 4.0f, glm::vec3(0, 0, 1.0)));
+	body.SetColor(glm::vec3(0.7, 0.7, 0.6));
+	body.SetID(++id);
 	bodies.push_back(body);
-	bodies.back().AddCollider(boxCollider);
-	colliders.push_back(boxCollider);
-	bodies.back().SetColor(glm::vec3(0.7, 0.7, 0.6));
-	bodies.back().SetModelData();
+	bodies.back().AddCollider(collider);
+	colliders.push_back(collider);
 
-	boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(5.0,0,0.0));
-	boxCollider->SetModelData(boxModel);
-	boxCollider->SetScale(glm::vec3(1.0, 1.0, 1.0));
-	body.SetPosition(glm::vec3(0.0,0.0,0.0));
-	//body.SetVelocity(glm::vec3(0,-1.0,0));
+	ParseObj("resources/teapot.obj", mesh);
+	mesh.GetModelData(model);
+	body.SetModelData(model);
+	body.SetPosition(glm::vec3(0.0, 0.0, 0.0));
 	body.SetMass(1.0f);
-	body.SetOrientation(glm::angleAxis(0.0f, glm::vec3(0,0,1.0)));
+	body.SetOrientation(glm::angleAxis(0.78f, glm::vec3(0, 0, 1)));
+	body.SetColor(glm::vec3(0.4, 0.9, 0.1));
+	body.SetID(++id);
 	bodies.push_back(body);
-	bodies.back().AddCollider(boxCollider);
-	colliders.push_back(boxCollider);
-
-	boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(-5.0,0,0));
-	boxCollider->SetModelData(boxModel);
-	boxCollider->SetScale(glm::vec3(1.0, 1.0, 1.0));
-	bodies.back().AddCollider(boxCollider);
-	colliders.push_back(boxCollider);
-	bodies.back().SetModelData();
+	std::vector<HMesh> meshes;
+	ParseObj("resources/teapot_hulls.obj", meshes);
+	for (int i = 0; i < meshes.size(); i++)
+	{
+		collider = new HullCollider(meshes[i]);
+		bodies.back().AddCollider(collider);
+		colliders.push_back(collider);
+	}
 }
 
 void CompositeBodyTest::OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods)

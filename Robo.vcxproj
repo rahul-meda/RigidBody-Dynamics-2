@@ -123,7 +123,6 @@
     <ClCompile Include="Graphics\stb_image.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Physics\Body.cpp" />
-    <ClCompile Include="Physics\Collider.cpp" />
     <ClCompile Include="Physics\ConstraintCommon.cpp" />
     <ClCompile Include="Physics\Contact.cpp" />
     <ClCompile Include="Physics\HullCollider.cpp" />

@@ -22,10 +22,10 @@ bool QueryFaceAxes(FaceQuery& query, HullCollider* A, HullCollider* B)
 
 		support = B->GetSupport(-axis);				// max projection of B on axis
 
-		vA = A->GetFace(i)->edge->tail->position + A->GetPosition();			// min prohection of A on axis
+		vA = A->GetFace(i)->edge->tail->position;			// min prohection of A on axis
 		vA = B->GetBody()->LocaltoLocalPoint(A->GetBody(), vA);
 
-		separation = glm::dot(B->GetVertex(support)->position + B->GetPosition() - vA, axis);	// compare projections
+		separation = glm::dot(B->GetVertex(support)->position - vA, axis);	// compare projections
 
 		if (separation > 0.0f)						// early out?
 			return false;
@@ -87,7 +87,7 @@ bool QueryEdgeAxes(EdgeQuery& query, HullCollider* A, HullCollider* B)
 				if (L < tolerance * glm::sqrt(glm::length2(edgeA) * glm::length2(edgeB)))
 					continue;
 
-				pA = A->GetEdge(iA)->tail->position + A->GetPosition();
+				pA = A->GetEdge(iA)->tail->position;
 				pA = B->GetBody()->LocaltoLocalPoint(A->GetBody(), pA);
 				// ensure consistent normal orientation (from A to B)
 				if (glm::dot(pA - cA, axis) < 0.0f)
@@ -95,7 +95,7 @@ bool QueryEdgeAxes(EdgeQuery& query, HullCollider* A, HullCollider* B)
 
 				axis /= L;
 
-				pB = B->GetEdge(iB)->tail->position + B->GetPosition();
+				pB = B->GetEdge(iB)->tail->position;
 				separation = glm::dot(pB - pA, axis);
 
 				if (separation > 0.0f)	return false;
@@ -135,8 +135,8 @@ void CreateEdgeContact(std::vector<Manifold>& manifolds, HullCollider* A, HullCo
 {
 	HEdge* edgeA = A->GetEdge(query.edgeIndex1);
 	HEdge* edgeB = B->GetEdge(query.edgeIndex2);
-	glm::vec3 pA = A->GetBody()->LocalToGlobalPoint(edgeA->tail->position + A->GetPosition());
-	glm::vec3 pB = B->GetBody()->LocalToGlobalPoint(edgeB->tail->position + B->GetPosition());
+	glm::vec3 pA = A->GetBody()->LocalToGlobalPoint(edgeA->tail->position);
+	glm::vec3 pB = B->GetBody()->LocalToGlobalPoint(edgeB->tail->position);
 	glm::vec3 d1 = A->GetBody()->LocalToGlobalVec(edgeA->GetDirection());
 	glm::vec3 d2 = B->GetBody()->LocalToGlobalVec(edgeB->GetDirection());
 	glm::vec3 r = pA - pB;
@@ -175,7 +175,7 @@ void CreateFaceContact(std::vector<Manifold>& manifolds, HullCollider* incident,
 	auto start = incident->GetFace(incidentFace)->edge;
 	auto edge = start;
 	do {
-		inPoly.push_back(incident->GetBody()->LocalToGlobalPoint(edge->tail->position + incident->GetPosition()));
+		inPoly.push_back(incident->GetBody()->LocalToGlobalPoint(edge->tail->position));
 		edge = edge->next;
 	} while (edge != start);
 
@@ -186,7 +186,7 @@ void CreateFaceContact(std::vector<Manifold>& manifolds, HullCollider* incident,
 		edge = start;
 		do {
 			normal = reference->GetBody()->LocalToGlobalVec(edge->twin->face->normal);
-			point = reference->GetBody()->LocalToGlobalPoint(edge->tail->position + reference->GetPosition());
+			point = reference->GetBody()->LocalToGlobalPoint(edge->tail->position);
 			planes.push_back(HalfSpace(normal, point));
 			edge = edge->next;
 		} while (edge != start);
@@ -231,7 +231,7 @@ void CreateFaceContact(std::vector<Manifold>& manifolds, HullCollider* incident,
 
 	glm::vec3 normal = reference->GetFace(referenceFace)->normal;
 	normal = reference->GetBody()->LocalToGlobalVec(normal);
-	glm::vec3 point = reference->GetFace(referenceFace)->edge->tail->position + reference->GetPosition();
+	glm::vec3 point = reference->GetFace(referenceFace)->edge->tail->position;
 	point = reference->GetBody()->LocalToGlobalPoint(point);
 	HalfSpace refFace(normal, point);
 	float distance;

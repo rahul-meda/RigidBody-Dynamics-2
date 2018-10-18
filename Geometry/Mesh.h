@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <vector>
-
+#include "Body.h"
 
 // half-edge data structure to represent mesh collision geometry
 // for fast adjacency queries
@@ -56,6 +56,79 @@ struct HMesh
 	std::vector<HEdge*> edges;
 	std::vector<HFace*> faces;
 
+	HMesh()
+	{}
+
+	HMesh(const HMesh& mesh)
+	{
+		vertices = std::vector<HVertex*>(mesh.vertices.size(), nullptr);
+		edges = std::vector<HEdge*>(mesh.edges.size(), nullptr);
+		faces = std::vector<HFace*>(mesh.faces.size(), nullptr);
+
+		for (auto mVert : mesh.vertices)
+		{
+			HVertex* v = new HVertex();
+			v->id = mVert->id;
+			v->position = mVert->position;
+			v->edge = nullptr;
+			vertices[mVert->id - 1] = v;
+		}
+
+		for (auto mFace : mesh.faces)
+		{
+			HFace* f = new HFace();
+			f->id = mFace->id;
+			f->normal = mFace->normal;
+			f->edge = nullptr;
+			faces[mFace->id - 1] = f;
+		}
+
+		for (auto mEdge : mesh.edges)
+		{
+			HEdge* e = new HEdge();
+			e->id = mEdge->id;
+			e->duplicate = mEdge->duplicate;
+			e->tail = vertices[mEdge->tail->id - 1];
+			if (e->tail->edge == nullptr)
+				e->tail->edge = e;
+
+			e->face = faces[mEdge->face->id - 1];
+			edges[mEdge->id - 1] = e;
+		}
+
+		for (auto mEdge : mesh.edges)
+		{
+			edges[mEdge->id - 1]->next = edges[mEdge->next->id - 1];
+			if (mEdge->twin != nullptr)
+			{
+				edges[mEdge->id - 1]->twin = edges[mEdge->twin->id - 1];
+			}
+		}
+
+		for (auto mFace : mesh.faces)
+		{
+			faces[mFace->id - 1]->edge = edges[mFace->edge->id - 1];
+			faces[mFace->id - 1]->normal = glm::cross(faces[mFace->id - 1]->edge->GetDirection(), faces[mFace->id - 1]->edge->next->GetDirection());
+			faces[mFace->id - 1]->normal = glm::normalize(faces[mFace->id - 1]->normal);
+		}
+
+		// arrange edges such that first half are edges, 
+		// and next half are twins
+		std::vector<HEdge*> e1, e2;
+		for (HEdge* e : edges)
+		{
+			if (!(e->duplicate))
+				e1.push_back(e);
+			else
+				e2.push_back(e);
+		}
+		edges.clear();
+		for (HEdge* e : e1)
+			edges.push_back(e);
+		for (HEdge* e : e2)
+			edges.push_back(e);
+	}
+
 	// calculates the triangle indices
 	// used by gaphics to render solid mesh in triangle mode
 	void GetTriangleIndices(std::vector<int>& indices) const
@@ -79,7 +152,6 @@ struct HMesh
 		}
 	}
 
-	// To do
 	// calculates line indices
 	// used by graphics to render mesh in wire-frame mode
 	void GetLineIndices(std::vector<int>& indices) const
@@ -93,5 +165,19 @@ struct HMesh
 			indices.push_back(id1);
 			indices.push_back(id2);
 		}
+	}
+
+	void GetModelData(ModelData& m) const
+	{
+		m.vertices.clear();
+		m.indices.clear();
+		m.frameIndices.clear();
+
+		for (auto v : vertices)
+		{
+			m.vertices.push_back(v->position);
+		}
+		GetTriangleIndices(m.indices);
+		GetLineIndices(m.frameIndices);
 	}
 };

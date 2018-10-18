@@ -32,9 +32,6 @@ void InertiaTest::OnInit(GLFWwindow* window)
 	ModelData boxModel(vertices, indices, frameIndices);
 
 	Collider* boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(0));
-	boxCollider->SetModelData(boxModel);
-	boxCollider->SetScale(glm::vec3(3.0, 1.0, 2.0));
 
 	Body body;
 	body.SetPosition(glm::vec3(0));

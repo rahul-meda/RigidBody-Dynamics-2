@@ -123,23 +123,6 @@ HFace* HullCollider::GetFace(int i) const
 	return faces[i];
 }
 
-void HullCollider::SetScale(const glm::vec3& s)
-{
-	scale = s;
-	for (auto v : vertices)
-	{
-		v->position.x *= scale.x;
-		v->position.y *= scale.y;
-		v->position.z *= scale.z;
-	}
-	for (glm::vec3& v : modelData.vertices)
-	{
-		v.x *= s.x;
-		v.y *= s.y;
-		v.z *= s.z;
-	}
-}
-
 void HullCollider::CalculateMass()
 {
 	glm::vec3 diag(0.0f);
@@ -184,8 +167,9 @@ void HullCollider::CalculateMass()
 	}
 
 	localCentroid /= (volume * 4.0f);
-	glm::vec3 globalCentroid = body->LocalToGlobalPoint(position) + body->LocalToGlobalVec(localCentroid);
-	centroid = body->GlobalToLocalPoint(globalCentroid);
+	/*glm::vec3 globalCentroid = body->LocalToGlobalPoint(position) + body->LocalToGlobalVec(localCentroid);
+	centroid = body->GlobalToLocalPoint(globalCentroid);*/
+	centroid = localCentroid;
 
 	volume *= (1.0f / 6.0f);
 	diag /= volume * 60.0f;
@@ -217,53 +201,4 @@ int HullCollider::GetSupport(const glm::vec3& dir) const
 	}
 
 	return index;
-}
-
-void HullCollider::SetModel(Model* model)
-{
-	poly = static_cast<Poly*>(model);
-}
-
-void HullCollider::Render()
-{
-	static glm::mat4 T(1), R(1), S(1), M(1), V(1), P(1), VP(1), MVP(1);
-	V = Camera::GetInstance().GetViewMatrix();
-	P = Camera::GetInstance().GetProjectionMatrix();
-
-	T = glm::translate(body->LocalToGlobalPoint(position));
-	R = glm::toMat4(body->GetOrientation());
-	S = glm::scale(scale);
-	M = T * R * S;
-	VP = P * V;
-	MVP = VP * M;
-	poly->SetMVP(MVP);
-	poly->SetColor(color);
-	poly->Render();
-
-	poly->GetFrame()->SetMVP(MVP);
-	poly->GetFrame()->Render();
-
-	// face normals
-	/*for (HFace* f : faces)
-	{
-	glm::vec3 c(0);
-	int n = 0;
-
-	HEdge* e = f->edge;
-	do {
-	c += e->tail->position;
-	n++;
-	e = e->next;
-	} while (e != f->edge);
-	c /= n;
-	c = body->LocalToGlobalPoint(c);
-
-	std::vector<glm::vec3> verts = { c, c + 2.0f*body->LocalToGlobalVec(f->normal) };
-	std::vector<int> ids = {0, 1};
-	Line* line = new Line(verts, ids);
-	line->SetMVP(VP);
-	line->SetColor(glm::vec3(0,1,0));
-	line->Render();
-	delete line;
-	}*/
 }

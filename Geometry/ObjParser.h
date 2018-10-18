@@ -13,10 +13,12 @@ struct ObjFace
 // parse obj data into half-edge format
 bool ParseObj(const std::string& file, HMesh& mesh);
 
+bool ParseObj(const std::string& file, std::vector<HMesh>& meshes);
+
 // check for bad/invalid file
 bool Validate(const std::string& file);
 
-void ParseLine(std::vector<ObjFace>& objFaces, HMesh& mesh, const std::string& line);
+void ParseLine(std::vector<ObjFace>& objFaces, HMesh& mesh, const std::string& line, bool& split, bool& first, int offset = 0);
 
 void AddFace(HMesh& mesh, const std::vector<int>& vids);
 

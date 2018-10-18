@@ -33,10 +33,6 @@ void FrictionTest::OnInit(GLFWwindow* window)
 
 	// floor
 	Collider* boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(0));
-	boxCollider->SetModelData(boxModel);
-	boxCollider->SetScale(glm::vec3(20.0, 1.0, 20.0));
-	boxCollider->SetColor(glm::vec3(0.7, 0.7, 0.6));
 	Body body;
 	body.SetPosition(glm::vec3(0));
 	body.SetMass(0.0f);
@@ -45,9 +41,6 @@ void FrictionTest::OnInit(GLFWwindow* window)
 	colliders.push_back(boxCollider);
 
 	boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(0.0, 3.0, 0.0));
-	boxCollider->SetModelData(boxModel);
-	boxCollider->SetScale(glm::vec3(2.0, 2.0, 2.0));
 	body.SetPosition(glm::vec3(0.0, 3.0, 0.0));
 	body.SetVelocity(glm::vec3(5.0,0.0,0.0));
 	body.SetMass(1.0f);
@@ -57,9 +50,6 @@ void FrictionTest::OnInit(GLFWwindow* window)
 	colliders.push_back(boxCollider);
 
 	boxCollider = new HullCollider(mesh);
-	boxCollider->SetPosition(glm::vec3(0.0, 3.0, 5.0));
-	boxCollider->SetModelData(boxModel);
-	boxCollider->SetScale(glm::vec3(2.0, 2.0, 2.0));
 	body.SetPosition(glm::vec3(0.0, 3.0, 5.0));
 	body.SetVelocity(glm::vec3(7.0,0.0,0.0));
 	body.SetMass(1.0f);

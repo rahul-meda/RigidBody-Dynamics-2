@@ -24,7 +24,8 @@ Body::Body()
 	angularVelocity(0),
 	forceSum(0),
 	torqueSum(0),
-	color(0.4, 0.9, 0.1)
+	color(0.4, 0.9, 0.1),
+	id(0)
 {}
 
 void Body::SetMass(const float m)
@@ -146,46 +147,26 @@ glm::vec3 Body::GetAngularVelocity() const
 	return angularVelocity;
 }
 
-void Body::SetModelData()
+void Body::SetModelData(const ModelData& m)
 {
-	std::vector<glm::vec3> vertices;
-	std::vector<int> indices;
-	std::vector<int> frameIndices;
-	int offset = 0;
-
-	for (Collider* c : colliders)
-	{
-		for (glm::vec3 v : c->GetModelData().vertices)
-		{
-			vertices.push_back(v + c->GetPosition());
-		}
-	}
-	for (Collider* c : colliders)
-	{
-		for (int i : c->GetModelData().indices)
-		{
-			indices.push_back(i + offset);
-		}
-		offset = c->GetModelData().vertices.size();
-	}
-	offset = 0;
-	for (Collider* c : colliders)
-	{
-		for (int i : c->GetModelData().frameIndices)
-		{
-			frameIndices.push_back(i + offset);
-		}
-		offset = c->GetModelData().vertices.size();
-	}
-
-	model = new Model(vertices, indices);
-	frame = new Model(vertices, frameIndices);
+	model = new Model(m.vertices, m.indices);
+	frame = new Model(m.vertices, m.frameIndices);
 	frame->SetPrimitive(GL_LINES);
 }
 
 void Body::SetColor(const glm::vec3& color)
 {
 	this->color = color;
+}
+
+void Body::SetID(const int i)
+{
+	id = i;
+}
+
+int Body::GetID() const
+{
+	return id;
 }
 
 const glm::vec3 Body::LocalToGlobalVec(const glm::vec3& v) const

@@ -1,6 +1,7 @@
 
 #include "PrimitiveQuery.h"
 #include "HullCollider.h"
+#include "Body.h"
 
 bool QueryPoint(Collider* collider, const glm::vec3& point)
 {
@@ -11,7 +12,12 @@ bool QueryPoint(Collider* collider, const glm::vec3& point)
 		HullCollider* c = static_cast<HullCollider*>(collider);
 		for (int i = 0; i < c->GetFaceCount(); i++)
 		{
-			return (glm::dot(c->GetFace(i)->edge->tail->position - point, c->GetFace(i)->normal) < 0.0f);
+			glm::vec3 P = c->GetFace(i)->edge->tail->position;
+			P = c->GetBody()->LocalToGlobalPoint(P);
+			glm::vec3 n = c->GetFace(i)->normal;
+			n = c->GetBody()->LocalToGlobalVec(n);
+			if (glm::dot(P - point, n) < 0.0f)
+				return false;
 		}
 		return true;
 	}

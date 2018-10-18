@@ -13,9 +13,6 @@ private:
 	std::vector<HEdge*> edges;
 	std::vector<HFace*> faces;
 
-	Poly* poly;
-	Poly* frame;
-
 public:
 	HullCollider(const HMesh& mesh);
 
@@ -33,17 +30,9 @@ public:
 	HEdge* GetEdge(int i) const;
 	HFace* GetFace(int i) const;
 
-	void SetScale(const glm::vec3& s);
-
 	// calculaate mass and inertia from geometry data
 	void CalculateMass();
 
 	// returns the furthest vertex on the hull in given direction
 	int GetSupport(const glm::vec3& dir) const;
-
-	void SetModel(Model* model);
-
-	void SetColor(const glm::vec3 color);
-
-	void Render();
 };

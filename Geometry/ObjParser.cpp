@@ -7,6 +7,10 @@
 
 bool ParseObj(const std::string& file, HMesh& mesh)
 {
+	mesh.vertices.clear();
+	mesh.edges.clear();
+	mesh.faces.clear();
+
 	if (!Validate(file))
 		return false;
 
@@ -14,10 +18,12 @@ bool ParseObj(const std::string& file, HMesh& mesh)
 	std::string line;
 	std::vector<ObjFace> objFaces;
 
+	bool split = false;
+	bool first = true;
 	while (ifs.good())
 	{
 		getline(ifs, line);
-		ParseLine(objFaces, mesh, line);
+		ParseLine(objFaces, mesh, line, split, first);
 	}
 
 	for (ObjFace objFace : objFaces)
@@ -28,6 +34,45 @@ bool ParseObj(const std::string& file, HMesh& mesh)
 	ConnectTwins(mesh);
 
 	SortEdges(mesh);
+}
+
+bool ParseObj(const std::string& file, std::vector<HMesh>& meshes)
+{
+	meshes.clear();
+
+	if (!Validate(file))
+		return false;
+
+	std::ifstream ifs(file, std::ifstream::in);
+	std::string line;
+	std::vector<ObjFace> objFaces;
+
+	bool split = false;
+	bool first = true;
+	int offset = 0;
+	while (ifs.good())
+	{
+		HMesh mesh;
+		while (ifs.good())
+		{
+			getline(ifs, line);
+			ParseLine(objFaces, mesh, line, split, first, offset);
+			if (split)
+				break;
+		}
+
+		for (ObjFace objFace : objFaces)
+		{
+			AddFace(mesh, objFace.vids);
+		}
+		objFaces.clear();
+
+		ConnectTwins(mesh);
+		SortEdges(mesh);
+		meshes.push_back(mesh);
+		split = false;
+		offset += mesh.vertices.size();
+	}
 }
 
 bool Validate(const std::string& file)
@@ -44,10 +89,11 @@ bool Validate(const std::string& file)
 	return true;
 }
 
-void ParseLine(std::vector<ObjFace>& objFaces, HMesh& mesh, const std::string& line)
+void ParseLine(std::vector<ObjFace>& objFaces, HMesh& mesh, const std::string& line, bool& split, bool& first,int offset)
 {
 	if (line[0] == 'v' && line[1] == ' ')
 	{
+		first = false;
 		HVertex* v = new HVertex();
 
 		sscanf(line.c_str(), "v %f %f %f", &v->position.x, &v->position.y, &v->position.z);
@@ -71,10 +117,13 @@ void ParseLine(std::vector<ObjFace>& objFaces, HMesh& mesh, const std::string& l
 		for (int i = 1; i < tokens.size(); i++)
 		{
 			sscanf(tokens[i].c_str(), "%d", &vid);
-			f.vids.push_back(vid);
+			f.vids.push_back(vid - offset);
 		}
-
 		objFaces.push_back(f);
+	}
+	else if (line[0] == 'o' && line[1] == ' ' && !first)
+	{
+		split = true;
 	}
 }
 

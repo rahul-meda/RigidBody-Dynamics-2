@@ -9,6 +9,19 @@
 
 class Collider;
 
+struct ModelData
+{
+	std::vector<glm::vec3> vertices;
+	std::vector<int> indices;
+	std::vector<int> frameIndices;
+
+	ModelData(){};
+
+	ModelData(const std::vector<glm::vec3>& vertices, const std::vector<int>& indices, const std::vector<int>& frameIndices)
+		: vertices(vertices), indices(indices), frameIndices(frameIndices)
+	{}
+};
+
 struct Velocity
 {
 	glm::vec3 v;
@@ -57,6 +70,7 @@ private:
 	Model* model;
 	Model* frame;
 	glm::vec3 color;
+	int id;
 
 public:
 	Body();
@@ -94,9 +108,12 @@ public:
 	void SetAngularVelocity(const glm::vec3& w);
 	glm::vec3 GetAngularVelocity() const;
 
-	void SetModelData();
+	void SetModelData(const ModelData& m);
 
 	void SetColor(const glm::vec3& color);
+
+	void SetID(const int i);
+	int GetID() const;
 
 	const glm::vec3 LocalToGlobalVec(const glm::vec3& v) const;
 

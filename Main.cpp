@@ -5,7 +5,7 @@
 #include <vector>
 #include "Simulation/Simulations.h"
 
-Simulation* sim = &PositionJointTest::GetInstance();
+Simulation* sim = &CompositeBodyTest::GetInstance();
 
 void OnWindowResize(GLFWwindow* window, int width, int height)
 {

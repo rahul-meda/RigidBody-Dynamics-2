@@ -223,6 +223,9 @@ void Simulation::Step(const float dt)
 	{
 		for (int iB = iA + 1; iB < colliders.size(); iB++)
 		{
+			if (colliders[iA]->GetBody()->GetID() == colliders[iB]->GetBody()->GetID())
+				continue;
+
 			DetectCollision(manifolds, colliders[iA], colliders[iB]);
 		}
 	}

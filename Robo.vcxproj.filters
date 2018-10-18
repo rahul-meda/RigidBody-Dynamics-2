@@ -136,9 +136,6 @@
     <ClCompile Include="Physics\HullCollider.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Physics\Collider.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
     <ClCompile Include="Physics\NarrowPhase.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
