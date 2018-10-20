@@ -25,7 +25,7 @@ Body::Body()
 	forceSum(0),
 	torqueSum(0),
 	color(0.4, 0.9, 0.1),
-	id(0)
+	tag("")
 {}
 
 void Body::SetMass(const float m)
@@ -147,6 +147,11 @@ glm::vec3 Body::GetAngularVelocity() const
 	return angularVelocity;
 }
 
+std::vector<Collider*>& Body::GetColliders()
+{
+	return colliders;
+}
+
 void Body::SetModelData(const ModelData& m)
 {
 	model = new Model(m.vertices, m.indices);
@@ -159,14 +164,14 @@ void Body::SetColor(const glm::vec3& color)
 	this->color = color;
 }
 
-void Body::SetID(const int i)
+void Body::SetTag(const std::string& s)
 {
-	id = i;
+	tag = s;
 }
 
-int Body::GetID() const
+std::string Body::GetTag() const
 {
-	return id;
+	return tag;
 }
 
 const glm::vec3 Body::LocalToGlobalVec(const glm::vec3& v) const

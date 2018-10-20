@@ -99,6 +99,12 @@
     <ClInclude Include="Physics\PrimitiveQuery.h">
       <Filter>Physics</Filter>
     </ClInclude>
+    <ClInclude Include="Simulation\FractureTest.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation\MergeCoplanarTest.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
@@ -168,6 +174,15 @@
     </ClCompile>
     <ClCompile Include="Physics\PrimitiveQuery.cpp">
       <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\FractureTest.cpp">
+      <Filter>Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\MergeCoplanarTest.cpp">
+      <Filter>Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry\Mesh.cpp">
+      <Filter>Geometry</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

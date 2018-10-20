@@ -5,7 +5,7 @@
 #include <sstream>
 #include <map>
 
-bool ParseObj(const std::string& file, HMesh& mesh)
+bool ParseObj(const std::string& file, HMesh& mesh, bool merge)
 {
 	mesh.vertices.clear();
 	mesh.edges.clear();
@@ -32,11 +32,16 @@ bool ParseObj(const std::string& file, HMesh& mesh)
 	}
 
 	ConnectTwins(mesh);
-
 	SortEdges(mesh);
+
+	if (merge)
+	{
+		int n = mesh.MergeFaces();
+		SortEdges(mesh);
+	}
 }
 
-bool ParseObj(const std::string& file, std::vector<HMesh>& meshes)
+bool ParseObj(const std::string& file, std::vector<HMesh>& meshes, bool merge)
 {
 	meshes.clear();
 
@@ -69,6 +74,13 @@ bool ParseObj(const std::string& file, std::vector<HMesh>& meshes)
 
 		ConnectTwins(mesh);
 		SortEdges(mesh);
+
+		if (merge)
+		{
+			int n = mesh.MergeFaces();
+			SortEdges(mesh);
+		}
+
 		meshes.push_back(mesh);
 		split = false;
 		offset += mesh.vertices.size();

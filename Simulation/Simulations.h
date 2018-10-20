@@ -9,3 +9,5 @@
 #include "FrictionTest.h"
 #include "PositionJointTest.h"
 #include "CompositeBodyTest.h"
+#include "FractureTest.h"
+#include "MergeCoplanarTest.h"

@@ -105,8 +105,10 @@
     <ClInclude Include="Physics\PrimitiveQuery.h" />
     <ClInclude Include="Simulation\CollisionDetectionTest.h" />
     <ClInclude Include="Simulation\CompositeBodyTest.h" />
+    <ClInclude Include="Simulation\FractureTest.h" />
     <ClInclude Include="Simulation\FrictionTest.h" />
     <ClInclude Include="Simulation\InertiaTest.h" />
+    <ClInclude Include="Simulation\MergeCoplanarTest.h" />
     <ClInclude Include="Simulation\ParserTest.h" />
     <ClInclude Include="Simulation\PositionJointTest.h" />
     <ClInclude Include="Simulation\ScaleTest.h" />
@@ -115,6 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Geometry\Geometry.cpp" />
+    <ClCompile Include="Geometry\Mesh.cpp" />
     <ClCompile Include="Geometry\ObjParser.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Graphics\Camera.cpp" />
@@ -132,8 +135,10 @@
     <ClCompile Include="Physics\PrimitiveQuery.cpp" />
     <ClCompile Include="Simulation\CollisionDetectionTest.cpp" />
     <ClCompile Include="Simulation\CompositeBodyTest.cpp" />
+    <ClCompile Include="Simulation\FractureTest.cpp" />
     <ClCompile Include="Simulation\FrictionTest.cpp" />
     <ClCompile Include="Simulation\InertiaTest.cpp" />
+    <ClCompile Include="Simulation\MergeCoplanarTest.cpp" />
     <ClCompile Include="Simulation\ParserTest.cpp" />
     <ClCompile Include="Simulation\PositionJointTest.cpp" />
     <ClCompile Include="Simulation\ScaleTest.cpp" />

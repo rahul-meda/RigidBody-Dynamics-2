@@ -223,7 +223,7 @@ void Simulation::Step(const float dt)
 	{
 		for (int iB = iA + 1; iB < colliders.size(); iB++)
 		{
-			if (colliders[iA]->GetBody()->GetID() == colliders[iB]->GetBody()->GetID())
+			if (colliders[iA]->GetBody()->GetTag() == colliders[iB]->GetBody()->GetTag() && colliders[iA]->GetBody()->GetTag() != "")
 				continue;
 
 			DetectCollision(manifolds, colliders[iA], colliders[iB]);
@@ -278,10 +278,6 @@ void Simulation::Update()
 	glm::mat4 V = Camera::GetInstance().GetViewMatrix();
 	glm::mat4 P = Camera::GetInstance().GetProjectionMatrix();
 
-	/*for (auto collider : colliders)
-	{
-		collider->Render();
-	}*/
 	for (auto b : bodies)
 	{
 		b.Render();
@@ -312,12 +308,12 @@ void Simulation::Update()
 	}
 	if (panTop)
 	{
-		pitch += MOUSE_SENSITIVITY;
+		pitch -= MOUSE_SENSITIVITY;
 		Camera::GetInstance().Rotate(yaw, pitch, 0);
 	}
 	if (panBot)
 	{
-		pitch -= MOUSE_SENSITIVITY;
+		pitch += MOUSE_SENSITIVITY;
 		Camera::GetInstance().Rotate(yaw, pitch, 0);
 	}
 }

@@ -55,7 +55,9 @@ private:
 public:
 	Contact(Body* A, Body* B, const glm::vec3& position, const glm::vec3& normal, const float penetration);
 
-	glm::vec3 GetPosition() const{ return position; }
+	glm::vec3 GetPosition() const { return position; }
+	Body* GetBodyA() const { return A; }
+	Body* GetBodyB() const { return B; }
 
 	// Solves the contact by applying impulses
 	void SolveVelocities(Velocity& A, Velocity& B, const float dt);

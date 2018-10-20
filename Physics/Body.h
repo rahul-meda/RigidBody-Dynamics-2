@@ -70,7 +70,7 @@ private:
 	Model* model;
 	Model* frame;
 	glm::vec3 color;
-	int id;
+	std::string tag;
 
 public:
 	Body();
@@ -108,12 +108,14 @@ public:
 	void SetAngularVelocity(const glm::vec3& w);
 	glm::vec3 GetAngularVelocity() const;
 
+	std::vector<Collider*>& GetColliders();
+
 	void SetModelData(const ModelData& m);
 
 	void SetColor(const glm::vec3& color);
 
-	void SetID(const int i);
-	int GetID() const;
+	void SetTag(const std::string& s);
+	std::string GetTag() const;
 
 	const glm::vec3 LocalToGlobalVec(const glm::vec3& v) const;
 

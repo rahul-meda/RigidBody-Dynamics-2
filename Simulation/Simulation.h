@@ -71,5 +71,5 @@ public:
 
 	void Step(const float dt);
 
-	void Update();
+	virtual void Update();
 };

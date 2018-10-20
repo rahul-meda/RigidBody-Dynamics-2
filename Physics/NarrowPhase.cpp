@@ -145,7 +145,7 @@ void CreateEdgeContact(std::vector<Manifold>& manifolds, HullCollider* A, HullCo
 	// To do: can be converted to 2D segment overlap by
 	// projecting edgeB's end points on to the plane
 	// passing through edgeA, and normal to both edges
-	float a, b, c, d, e, f, s;
+	float a, b, c, d, e, f, s, t;
 	a = glm::dot(d1, d1);
 	b = glm::dot(d1, d2);
 	c = glm::dot(d1, r);
@@ -153,12 +153,28 @@ void CreateEdgeContact(std::vector<Manifold>& manifolds, HullCollider* A, HullCo
 	f = glm::dot(d2, r);
 
 	d = a*e - b*b;
-	assert(d > 0.0f);
+	//assert(d > 0.0f);
+	if (d <= 0)
+		return;
 
 	s = (b*f - c*e) / d;
-	assert((s > 0.0f) && (s < 1.0f));
+	//assert((s > 0.0f) && (s < 1.0f));
+	s = glm::clamp(s, 0.0f, 1.0f);
 
-	glm::vec3 pos = pA + s*d1;
+	t = (b * s + f) / e;
+
+	if (t < 0.0f)
+	{
+		t = 0.0f;
+		s = glm::clamp(-c/a, 0.0f, 1.0f);
+	}
+	else if (t > 1.0f)
+	{
+		t = 1.0f;
+		s = glm::clamp((b-c)/a, 0.0f, 1.0f);
+	}
+
+	glm::vec3 pos = (pA + s*d1 + pB + t*d2) * 0.5f;
 
 	Contact contact(A->GetBody(), B->GetBody(), pos, query.normal, -query.separation);
 	Manifold m;
@@ -223,6 +239,12 @@ void CreateFaceContact(std::vector<Manifold>& manifolds, HullCollider* incident,
 			}
 			A = B;
 		}
+
+		if (outPoly.size() == 0)	// why is this happening?
+		{
+			return;	
+		}
+
 		inPoly = outPoly;
 		outPoly.clear();
 	}

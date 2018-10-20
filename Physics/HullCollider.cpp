@@ -123,6 +123,58 @@ HFace* HullCollider::GetFace(int i) const
 	return faces[i];
 }
 
+// calculates the triangle indices
+// used by gaphics to render solid mesh in triangle mode
+void HullCollider::GetTriangleIndices(std::vector<int>& indices) const
+{
+	for (HFace* f : faces)
+	{
+		HEdge* start = f->edge;
+		HEdge* e = start;
+		int first, second, third;
+		first = e->tail->id - 1;
+		do		// triangle fan
+		{
+			second = e->next->tail->id - 1;
+			e = e->next;
+			third = e->next->tail->id - 1;
+
+			indices.push_back(first);
+			indices.push_back(second);
+			indices.push_back(third);
+		} while (e->next->next != start);
+	}
+}
+
+// calculates line indices
+// used by graphics to render mesh in wire-frame mode
+void HullCollider::GetLineIndices(std::vector<int>& indices) const
+{
+	int id1, id2;
+	for (int i = 0; i < edges.size() / 2; i++)
+	{
+		id1 = edges[i]->tail->id - 1;
+		id2 = edges[i]->next->tail->id - 1;
+
+		indices.push_back(id1);
+		indices.push_back(id2);
+	}
+}
+
+void HullCollider::GetModelData(ModelData& m) const
+{
+	m.vertices.clear();
+	m.indices.clear();
+	m.frameIndices.clear();
+
+	for (auto v : vertices)
+	{
+		m.vertices.push_back(v->position);
+	}
+	GetTriangleIndices(m.indices);
+	GetLineIndices(m.frameIndices);
+}
+
 void HullCollider::CalculateMass()
 {
 	glm::vec3 diag(0.0f);

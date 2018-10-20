@@ -11,9 +11,9 @@ struct ObjFace
 };
 
 // parse obj data into half-edge format
-bool ParseObj(const std::string& file, HMesh& mesh);
+bool ParseObj(const std::string& file, HMesh& mesh, bool merge = false);
 
-bool ParseObj(const std::string& file, std::vector<HMesh>& meshes);
+bool ParseObj(const std::string& file, std::vector<HMesh>& meshes, bool merge = false);
 
 // check for bad/invalid file
 bool Validate(const std::string& file);

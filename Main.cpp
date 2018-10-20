@@ -5,7 +5,7 @@
 #include <vector>
 #include "Simulation/Simulations.h"
 
-Simulation* sim = &CompositeBodyTest::GetInstance();
+Simulation* sim = &FractureTest::GetInstance();
 
 void OnWindowResize(GLFWwindow* window, int width, int height)
 {

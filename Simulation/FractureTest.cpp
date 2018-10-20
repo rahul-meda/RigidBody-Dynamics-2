@@ -1,17 +1,17 @@
 
-#include "CompositeBodyTest.h"
+#include "FractureTest.h"
 #include "ObjParser.h"
 #include "Poly.h"
 #include "HullCollider.h"
 #include "Collider.h"
 
-CompositeBodyTest& CompositeBodyTest::GetInstance()
+FractureTest& FractureTest::GetInstance()
 {
-	static CompositeBodyTest instance;
+	static FractureTest instance;
 	return instance;
 }
 
-void CompositeBodyTest::OnInit(GLFWwindow* window)
+void FractureTest::OnInit(GLFWwindow* window)
 {
 	Simulation::OnInit(window);
 
@@ -19,6 +19,7 @@ void CompositeBodyTest::OnInit(GLFWwindow* window)
 	ModelData model;
 	Collider* collider;
 	Body body;
+	int id = 0;
 
 	// floor
 	ParseObj("resources/floor.obj", mesh);
@@ -51,7 +52,7 @@ void CompositeBodyTest::OnInit(GLFWwindow* window)
 	}
 }
 
-void CompositeBodyTest::OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods)
+void FractureTest::OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods)
 {
 	Simulation::OnKeyInput(window, key, code, action, mods);
 
@@ -78,11 +79,11 @@ void CompositeBodyTest::OnKeyInput(GLFWwindow* window, int key, int code, int ac
 	}
 	if (keys[GLFW_KEY_X])
 	{
-		bodies[1].SetAngularVelocity(glm::vec3(1.0,0,0));
+		bodies[1].SetAngularVelocity(glm::vec3(1.0, 0, 0));
 	}
 	if (keys[GLFW_KEY_C])
 	{
-		bodies[1].SetAngularVelocity(glm::vec3(0,1.0,0));
+		bodies[1].SetAngularVelocity(glm::vec3(0, 1.0, 0));
 	}
 	if (keys[GLFW_KEY_V])
 	{
@@ -94,6 +95,60 @@ void CompositeBodyTest::OnKeyInput(GLFWwindow* window, int key, int code, int ac
 	}
 	if (keys[GLFW_KEY_F])
 	{
-		bodies[1].ApplyForce(200.0f*(glm::vec3(0,1.0,0)), glm::vec3(5.0,0,0));
+		bodies[1].ApplyForce(200.0f*(glm::vec3(0, 1.0, 0)), glm::vec3(5.0, 0, 0));
+	}
+}
+
+void FractureTest::Update()
+{
+	Simulation::Update();
+
+	static bool shatter = false;
+	if (!shatter)
+	{
+		for (auto m : manifolds)
+		{
+			for (auto c : m.contacts)
+			{
+				if (c.GetBodyA()->GetTag() == "teapot" || c.GetBodyB()->GetTag() == "teapot")
+					shatter = true;
+			}
+		}
+	}
+
+	static bool shattered = false;
+	if (shatter && !shattered)
+	{
+		Body b = bodies.back();
+		bodies.pop_back();
+
+		Body body;
+		glm::vec3 position(0);
+		glm::quat orientation;
+		ModelData model;
+
+		for (Collider* c : b.GetColliders())
+		{
+			for (auto v : static_cast<HullCollider*>(c)->GetVertices())
+			{
+				position += v->position;
+			}
+			position /= static_cast<HullCollider*>(c)->GetVertexCount();
+
+			for (auto v : static_cast<HullCollider*>(c)->GetVertices())
+			{
+				v->position -= position;
+			}
+
+			static_cast<HullCollider*>(c)->GetModelData(model);
+			body.SetModelData(model);
+			position = b.LocalToGlobalPoint(position);
+			body.SetPosition(position);
+			body.SetOrientation(b.GetOrientation());
+			bodies.push_back(body);
+			bodies.back().AddCollider(c);
+		}
+
+		shattered = true;
 	}
 }

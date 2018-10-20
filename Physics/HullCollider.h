@@ -30,6 +30,10 @@ public:
 	HEdge* GetEdge(int i) const;
 	HFace* GetFace(int i) const;
 
+	void GetTriangleIndices(std::vector<int>& indices) const;
+	void GetLineIndices(std::vector<int>& indices) const;
+	void GetModelData(ModelData& m) const;
+
 	// calculaate mass and inertia from geometry data
 	void CalculateMass();
 
