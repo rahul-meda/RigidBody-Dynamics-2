@@ -25,6 +25,7 @@ struct HEdge
 	HVertex* tail;			// vertex pointing to this edge
 	HFace* face;			// face to the left of this edge (CCW winding)
 	HEdge* next;			// next edge belonging to the same face
+	HEdge* prev;
 	HEdge* twin;			// opposite edge pointing to the tail
 	int id;					// edge index
 	bool duplicate;			// marked false for original edge, and true for the twin

@@ -192,9 +192,12 @@ void HMesh::FixTopological(HEdge* in, HEdge* out)
 			HEdge* third = in->twin->next;
 			out->face->edge = out->next;
 			third->face = in->face;
-			HEdge* inPrev = in->Prev();
+			HEdge* inPrev = in->prev;
 			inPrev->next = third;
 			third->next = out->next;
+			out->next->prev = third;
+			third->prev = inPrev;
+			inPrev->twin->prev = third->twin;
 
 			fids.push_back(adjFace->id);
 			eids.push_back(in->id);
@@ -208,9 +211,11 @@ void HMesh::FixTopological(HEdge* in, HEdge* out)
 			out->face->edge = out->next;
 			in->twin->tail = out->twin->tail;
 			in->next = out->next;
+			in->next->prev = in;
+			in->twin->prev = out->twin->prev;
 
 			adjFace->edge = in->twin->next;
-			HEdge* outPrev = out->twin->Prev();
+			HEdge* outPrev = out->twin->prev;
 			outPrev->next = in->twin;
 			outPrev->next->twin = in;
 
@@ -250,10 +255,12 @@ int HMesh::MergeFaces()
 			}
 
 			// connect in-coming and out-going extreme edges
-			HEdge* edgePrev = e->Prev();
-			HEdge* twinPrev = e->twin->Prev();
+			HEdge* edgePrev = e->prev;
+			HEdge* twinPrev = e->twin->prev;
 			edgePrev->next = e->twin->next;
 			twinPrev->next = e->next;
+			e->next->prev = twinPrev;
+			e->twin->next->prev = edgePrev;
 
 			fids.push_back(e->twin->face->id);
 			eids.push_back(e->id);
@@ -262,8 +269,8 @@ int HMesh::MergeFaces()
 			// check if topological invariants are violated while merging 
 			// each vertex must have at least 3 adjacent faces
 			// ToDo : 1. Save prev edge for each Hedge, 2. Recalculate normals - Newell planes
-			//FixTopological(edgePrev, edgePrev->next);
-			//FixTopological(twinPrev, twinPrev->next);
+			FixTopological(edgePrev, edgePrev->next);
+			FixTopological(twinPrev, twinPrev->next);
 		}
 	}
 

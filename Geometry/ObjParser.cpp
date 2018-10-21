@@ -74,6 +74,7 @@ bool ParseObj(const std::string& file, std::vector<HMesh>& meshes, bool merge)
 
 		ConnectTwins(mesh);
 		SortEdges(mesh);
+		offset += mesh.vertices.size();
 
 		if (merge)
 		{
@@ -83,7 +84,7 @@ bool ParseObj(const std::string& file, std::vector<HMesh>& meshes, bool merge)
 
 		meshes.push_back(mesh);
 		split = false;
-		offset += mesh.vertices.size();
+		//offset += mesh.vertices.size();
 	}
 }
 
@@ -199,6 +200,9 @@ void ConnectTwins(HMesh& mesh)
 			eTwin->duplicate = true;
 		}
 	}
+
+	for (auto e : mesh.edges)
+		e->prev = e->Prev();
 }
 
 void SortEdges(HMesh& mesh)
