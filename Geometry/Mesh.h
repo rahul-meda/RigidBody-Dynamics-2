@@ -29,6 +29,7 @@ struct HEdge
 	HEdge* twin;			// opposite edge pointing to the tail
 	int id;					// edge index
 	bool duplicate;			// marked false for original edge, and true for the twin
+	bool dirty = false;
 
 	glm::vec3 GetDirection() const;
 
@@ -56,14 +57,12 @@ struct HMesh
 	std::vector<int> eids;
 	std::vector<int> fids;
 
-	HMesh();
-
-	HMesh(const HMesh& mesh);
-
 	void RemoveObselete();
 
 	bool AreCoplanar(HFace* f1, HFace* f2);
 
+	// fix topological invaraints violated while merging
+	// each vertex should have at least 3 adjacent faces
 	void FixTopological(HEdge* in, HEdge* out);
 
 	// merge all faces that are nearly coplanar

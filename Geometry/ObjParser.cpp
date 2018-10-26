@@ -81,10 +81,9 @@ bool ParseObj(const std::string& file, std::vector<HMesh>& meshes, bool merge)
 			int n = mesh.MergeFaces();
 			SortEdges(mesh);
 		}
-
+		
 		meshes.push_back(mesh);
 		split = false;
-		//offset += mesh.vertices.size();
 	}
 }
 

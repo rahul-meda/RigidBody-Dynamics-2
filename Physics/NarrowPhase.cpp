@@ -159,6 +159,10 @@ void CreateEdgeContact(std::vector<Manifold>& manifolds, HullCollider* A, HullCo
 
 	s = (b*f - c*e) / d;
 	//assert((s > 0.0f) && (s < 1.0f));
+	// ToDo : This should never happen since SAT already reports overlapping edges
+	// Edge-Edge collisions are currently buggy because of this
+	// Possible causes are errors in face merging (not projecting faces to Newell planes or topological errors)
+	// or non-sensical hull data (probably from splitting or incorrect deep copy)
 	s = glm::clamp(s, 0.0f, 1.0f);
 
 	t = (b * s + f) / e;

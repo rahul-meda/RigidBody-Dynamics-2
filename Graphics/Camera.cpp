@@ -1,5 +1,5 @@
 
-#define CAM_SPEED 10.0f
+#define CAM_SPEED 25.0f
 #define DAMPING 0.97f
 #define SPEED_EPSILON 0.79f
 

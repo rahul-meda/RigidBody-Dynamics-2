@@ -36,7 +36,7 @@ void CollisionDetectionTest::OnInit(GLFWwindow* window)
 	mesh.GetModelData(model);
 	collider = new HullCollider(mesh);
 	body.SetModelData(model);
-	body.SetPosition(glm::vec3(0.0, 0.0, 0.0));
+	body.SetPosition(glm::vec3(10.0, 0.0, 0.0));
 	body.SetMass(1.0f);
 	body.SetOrientation(glm::angleAxis(0.78f, glm::vec3(0,0,1)));
 	body.SetColor(glm::vec3(0.4, 0.9, 0.1));
@@ -44,17 +44,23 @@ void CollisionDetectionTest::OnInit(GLFWwindow* window)
 	bodies.back().AddCollider(collider);
 	colliders.push_back(collider);
 
-	ParseObj("resources/box.obj", mesh);
+	ParseObj("resources/chair.obj", mesh);
 	mesh.GetModelData(model);
-	collider = new HullCollider(mesh);
 	body.SetModelData(model);
-	body.SetPosition(glm::vec3(0.0, -5.0, 0.0));
+	body.SetPosition(glm::vec3(0.0, 20.0, 0.0));
 	body.SetMass(1.0f);
-	body.SetOrientation(glm::angleAxis(0.0f, glm::vec3(0, 0, 1)));
+	body.SetOrientation(glm::angleAxis(0.78f, glm::vec3(0, 0, 1)));
 	body.SetColor(glm::vec3(0.4, 0.9, 0.1));
+	body.SetTag("teapot");
 	bodies.push_back(body);
-	bodies.back().AddCollider(collider);
-	colliders.push_back(collider);
+	std::vector<HMesh> meshes;
+	ParseObj("resources/chair_hulls.obj", meshes, true);
+	for (int i = 0; i < meshes.size(); i++)
+	{
+		collider = new HullCollider(meshes[i]);
+		bodies.back().AddCollider(collider);
+		colliders.push_back(collider);
+	}
 }
 
 void CollisionDetectionTest::OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods)

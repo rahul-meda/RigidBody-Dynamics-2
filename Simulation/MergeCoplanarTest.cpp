@@ -32,7 +32,7 @@ void MergeCoplanarTest::OnInit(GLFWwindow* window)
 	bodies.back().AddCollider(collider);
 	colliders.push_back(collider);
 
-	ParseObj("resources/coplanar_1.obj", mesh, true);
+	ParseObj("resources/chair_hulls.obj", mesh, true);
 	mesh.GetModelData(model);
 	collider = new HullCollider(mesh);
 	body.SetModelData(model);

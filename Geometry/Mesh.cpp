@@ -28,79 +28,6 @@ void HFace::CalculateNormal()
 	normal = glm::normalize(normal);
 }
 
-HMesh::HMesh()
-{}
-
-HMesh::HMesh(const HMesh& mesh)
-{
-	vertices = std::vector<HVertex*>(mesh.vertices.size(), nullptr);
-	edges = std::vector<HEdge*>(mesh.edges.size(), nullptr);
-	faces = std::vector<HFace*>(mesh.faces.size(), nullptr);
-
-	for (auto mVert : mesh.vertices)
-	{
-		HVertex* v = new HVertex();
-		v->id = mVert->id;
-		v->position = mVert->position;
-		v->edge = nullptr;
-		vertices[mVert->id - 1] = v;
-	}
-
-	for (auto mFace : mesh.faces)
-	{
-		HFace* f = new HFace();
-		f->id = mFace->id;
-		f->normal = mFace->normal;
-		f->edge = nullptr;
-		faces[mFace->id - 1] = f;
-	}
-
-	for (auto mEdge : mesh.edges)
-	{
-		HEdge* e = new HEdge();
-		e->id = mEdge->id;
-		e->duplicate = mEdge->duplicate;
-		e->tail = vertices[mEdge->tail->id - 1];
-		if (e->tail->edge == nullptr)
-			e->tail->edge = e;
-
-		e->face = faces[mEdge->face->id - 1];
-		edges[mEdge->id - 1] = e;
-	}
-
-	for (auto mEdge : mesh.edges)
-	{
-		edges[mEdge->id - 1]->next = edges[mEdge->next->id - 1];
-		if (mEdge->twin != nullptr)
-		{
-			edges[mEdge->id - 1]->twin = edges[mEdge->twin->id - 1];
-		}
-	}
-
-	for (auto mFace : mesh.faces)
-	{
-		faces[mFace->id - 1]->edge = edges[mFace->edge->id - 1];
-		faces[mFace->id - 1]->normal = glm::cross(faces[mFace->id - 1]->edge->GetDirection(), faces[mFace->id - 1]->edge->next->GetDirection());
-		faces[mFace->id - 1]->normal = glm::normalize(faces[mFace->id - 1]->normal);
-	}
-
-	// arrange edges such that first half are edges, 
-	// and next half are twins
-	std::vector<HEdge*> e1, e2;
-	for (HEdge* e : edges)
-	{
-		if (!(e->duplicate))
-			e1.push_back(e);
-		else
-			e2.push_back(e);
-	}
-	edges.clear();
-	for (HEdge* e : e1)
-		edges.push_back(e);
-	for (HEdge* e : e2)
-		edges.push_back(e);
-}
-
 void HMesh::RemoveObselete()
 {
 	std::vector<HVertex*> tempV;
@@ -176,11 +103,10 @@ bool HMesh::AreCoplanar(HFace* f1, HFace* f2)
 
 void HMesh::FixTopological(HEdge* in, HEdge* out)
 {
-	HFace* adjFace;
-	int nVerts = 0;
 	if (in->twin->face == out->twin->face)
 	{
-		adjFace = in->twin->face;
+		int nVerts = 0;
+		HFace* adjFace = in->twin->face;
 		HEdge* e = adjFace->edge;
 		do {
 			nVerts++;
@@ -190,39 +116,43 @@ void HMesh::FixTopological(HEdge* in, HEdge* out)
 		if (nVerts == 3)
 		{
 			HEdge* third = in->twin->next;
-			out->face->edge = out->next;
+			out->face->edge = third;
 			third->face = in->face;
 			HEdge* inPrev = in->prev;
 			inPrev->next = third;
 			third->next = out->next;
+			// is this really neccessary?
 			out->next->prev = third;
-			third->prev = inPrev;
-			inPrev->twin->prev = third->twin;
+			third->prev = in->prev;
 
 			fids.push_back(adjFace->id);
-			eids.push_back(in->id);
-			eids.push_back(in->twin->id);
-			eids.push_back(out->id);
-			eids.push_back(out->twin->id);
+			eids.push_back(in->id);			in->dirty = true;
+			eids.push_back(in->twin->id);	in->twin->dirty = true;
+			eids.push_back(out->id);		out->dirty = true;
+			eids.push_back(out->twin->id);	out->twin->dirty = true;
 			vids.push_back(out->tail->id);
 		}
 		else
 		{
 			out->face->edge = out->next;
+
 			in->twin->tail = out->twin->tail;
 			in->next = out->next;
 			in->next->prev = in;
 			in->twin->prev = out->twin->prev;
 
 			adjFace->edge = in->twin->next;
-			HEdge* outPrev = out->twin->prev;
-			outPrev->next = in->twin;
-			outPrev->next->twin = in;
+			out->twin->prev->next = in->twin;
+			out->twin->prev->next->twin = in;
 
-			eids.push_back(out->id);
-			eids.push_back(out->twin->id);
+			eids.push_back(out->id);		out->dirty = true;
+			eids.push_back(out->twin->id);	out->twin->dirty = true;
 			vids.push_back(out->tail->id);
 		}
+	}
+	else
+	{
+		in->face->edge = in;
 	}
 }
 
@@ -233,44 +163,38 @@ int HMesh::MergeFaces()
 	for (int i = 0; i < edges.size() / 2; i++)
 	{
 		e = edges[i];
+
+		if (e->dirty)	// should this happen?
+			continue;
+
 		if (AreCoplanar(e->face, e->twin->face))
 		{
 			n++;
-			// assign edge reference for the merged face
-			e->face->edge = e->next;
+			
+			HFace* adjFace = e->twin->face;
+			fids.push_back(adjFace->id);
 
-			// assign edges of the face to be merged
-			int nEdges = 0;
-			HEdge* curr = e->twin->face->edge;
+			HEdge* edgePrev = e->prev;
+			HEdge* edgeNext = e->next;
+			HEdge* twinPrev = e->twin->prev;
+			HEdge* twinNext = e->twin->next;
+
+			HEdge* curr = twinNext;
 			do {
-				nEdges++;
-				curr = curr->next;
-			} while (curr != e->twin->face->edge);
-
-			curr = e->twin->next;
-			for (int i = 1; i < nEdges; i++)
-			{
 				curr->face = e->face;
 				curr = curr->next;
-			}
+			} while (curr != e->twin);
 
-			// connect in-coming and out-going extreme edges
-			HEdge* edgePrev = e->prev;
-			HEdge* twinPrev = e->twin->prev;
-			edgePrev->next = e->twin->next;
-			twinPrev->next = e->next;
-			e->next->prev = twinPrev;
-			e->twin->next->prev = edgePrev;
+			edgePrev->next = twinNext;	
+			twinPrev->next = edgeNext;
+			edgeNext->prev = twinPrev;
+			twinNext->prev = edgePrev;
 
-			fids.push_back(e->twin->face->id);
-			eids.push_back(e->id);
-			eids.push_back(e->twin->id);
+			eids.push_back(e->id);			e->dirty = true;
+			eids.push_back(e->twin->id);	e->twin->dirty = true;
 
-			// check if topological invariants are violated while merging 
-			// each vertex must have at least 3 adjacent faces
-			// ToDo : 1. Save prev edge for each Hedge, 2. Recalculate normals - Newell planes
-			FixTopological(edgePrev, edgePrev->next);
-			FixTopological(twinPrev, twinPrev->next);
+			FixTopological(twinPrev, edgeNext);
+			FixTopological(edgePrev, twinNext);
 		}
 	}
 
