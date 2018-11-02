@@ -117,7 +117,6 @@ void HullCollider::CalculateMass()
 	glm::vec3 diag(0.0f);
 	glm::vec3 offDiag(0.0f);
 	float volume = 0.0f;
-	glm::vec3 localCentroid(0.0);
 
 	for (int i = 0; i < faces.size(); i++)
 	{
@@ -133,7 +132,7 @@ void HullCollider::CalculateMass()
 
 			float currentVolume = glm::dot(u, glm::cross(v, w));
 			volume += currentVolume;
-			localCentroid += (u + v + w) * currentVolume;
+			centroid += (u + v + w) * currentVolume;
 
 			for (int j = 0; j < 3; ++j)
 			{
@@ -155,10 +154,7 @@ void HullCollider::CalculateMass()
 		}
 	}
 
-	localCentroid /= (volume * 4.0f);
-	/*glm::vec3 globalCentroid = body->LocalToGlobalPoint(position) + body->LocalToGlobalVec(localCentroid);
-	centroid = body->GlobalToLocalPoint(globalCentroid);*/
-	centroid = localCentroid;
+	centroid /= (volume * 4.0f);
 
 	volume *= (1.0f / 6.0f);
 	diag /= volume * 60.0f;

@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include<glm/glm.hpp>
+#include <glm/glm.hpp>
+#include "Body.h"
 
 struct HalfSpace
 {
@@ -23,3 +24,8 @@ struct HalfSpace
 
 // Compute a consistent orthonormal basis with the given vector
 void ComputeBasis(const glm::vec3& i, glm::vec3& j, glm::vec3& k);
+
+void CreateSphere(const float radius, ModelData& model);
+
+// builds a skew symmetric matrix from the vector
+glm::mat3 Skew(const glm::vec3& v);

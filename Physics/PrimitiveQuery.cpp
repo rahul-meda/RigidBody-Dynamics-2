@@ -2,6 +2,7 @@
 #include "PrimitiveQuery.h"
 #include "HullCollider.h"
 #include "Body.h"
+#include "SphereCollider.h"
 
 bool QueryPoint(Collider* collider, const glm::vec3& point)
 {
@@ -21,5 +22,67 @@ bool QueryPoint(Collider* collider, const glm::vec3& point)
 		}
 		return true;
 	}
+	case (Collider::Sphere) :
+	{
+		SphereCollider* c = static_cast<SphereCollider*>(collider);
+		glm::vec3 C = c->GetBody()->LocalToGlobalPoint(c->GetCentroid());
+		float d2 = glm::length2(point - C);
+		return (d2 < c->GetRadius() * c->GetRadius());
 	}
+	default :
+		return false;
+	}
+}
+
+bool IntersectSegmentSphere(const glm::vec3& A, const glm::vec3& B, SphereCollider* s, glm::vec3& P)
+{
+	glm::vec3 m = A - s->GetBody()->GetPosition();
+	float l = glm::length(B - A);
+	glm::vec3 d = (B - A) / l;
+	float b = glm::dot(m, d);
+	float c = glm::dot(m, m) - s->GetRadius() * s->GetRadius();
+
+	// A is outside, and AB is pointing away
+	if (c > 0.0f && b > 0.0f)
+		return false;
+
+	float disc = b * b - c;
+
+	if (disc < 0.0f)
+		return false;
+
+	float t = -b - std::sqrtf(disc);
+
+	if (t > l)
+		return false;
+
+	t = t < 0 ? 0 : -b;
+	P = A + t * d;
+
+	return true;
+}
+
+bool TriangleIsCCW(const glm::vec3& A, const glm::vec3& B, const glm::vec3& C, const glm::vec3& normal)
+{
+	return (glm::dot(glm::cross(B - A, C - B), normal) >= 0);
+}
+
+bool QueryPoint(const glm::vec3& P, const std::vector<glm::vec3>& verts, const glm::vec3& normal)
+{
+	int n = verts.size();
+
+	int low = 0, high = n, mid = 0;
+	do {
+		mid = (low + high) / 2;
+		if (TriangleIsCCW(verts[0], verts[mid], P, normal))
+			low = mid;
+		else
+			high = mid;
+
+	} while (low + 1 < high);
+
+	if (low == 0 || high == n)
+		return false;
+
+	return (TriangleIsCCW(verts[low], verts[high], P, normal));
 }

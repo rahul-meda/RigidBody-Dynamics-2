@@ -13,6 +13,9 @@ float CalculateEffectiveMass(const Jacobian& J, const Body* A, const Body* B)
 
 float CalculateLagrangian(const Jacobian& J, const Velocity& A, const Velocity& B, float effMass, float bias)
 {
+	if (effMass == 0.0f)
+		return 0.0f;
+		
 	float JVi;	// velocity transformed into constraint space
 
 	JVi = glm::dot(J.L1, A.v)
@@ -25,6 +28,9 @@ float CalculateLagrangian(const Jacobian& J, const Velocity& A, const Velocity& 
 
 float CalculateLagrangian(const Jacobian& J, const Body*A, const Body* B, const float effMass, const float bias)
 {
+	if (effMass == 0.0f)
+		return 0.0f;
+
 	float JVi;	// velocity transformed into constraint space
 
 	JVi = glm::dot(J.L1, A->GetVelocity())

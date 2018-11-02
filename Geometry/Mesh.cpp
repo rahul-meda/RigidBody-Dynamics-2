@@ -93,6 +93,16 @@ void HMesh::RemoveObselete()
 	fids.clear();
 }
 
+void HMesh::Scale(const glm::vec3& scale)
+{
+	for (auto v : vertices)
+	{
+		v->position.x *= scale.x;
+		v->position.y *= scale.y;
+		v->position.z *= scale.z;
+	}
+}
+
 bool HMesh::AreCoplanar(HFace* f1, HFace* f2)
 {
 	const static float e = 0.01;

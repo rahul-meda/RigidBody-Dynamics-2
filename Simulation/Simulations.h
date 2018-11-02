@@ -11,3 +11,7 @@
 #include "CompositeBodyTest.h"
 #include "FractureTest.h"
 #include "MergeCoplanarTest.h"
+#include "PlaneConstraintTest.h"
+#include "RevoluteJointTest.h"
+#include "LemonadeMachine.h"
+#include "Dominoes.h"

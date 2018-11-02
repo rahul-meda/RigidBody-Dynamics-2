@@ -105,6 +105,27 @@
     <ClInclude Include="Simulation\MergeCoplanarTest.h">
       <Filter>Simulation</Filter>
     </ClInclude>
+    <ClInclude Include="Physics\PlaneConstraint.h">
+      <Filter>Physics\Constraints</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation\PlaneConstraintTest.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\RevoluteJoint.h">
+      <Filter>Physics\Constraints</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation\RevoluteJointTest.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\SphereCollider.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation\LemonadeMachine.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation\Dominoes.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
@@ -183,6 +204,27 @@
     </ClCompile>
     <ClCompile Include="Geometry\Mesh.cpp">
       <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\PlaneConstraint.cpp">
+      <Filter>Physics\Constraints</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\PlaneConstraintTest.cpp">
+      <Filter>Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\RevoluteJoint.cpp">
+      <Filter>Physics\Constraints</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\RevoluteJointTest.cpp">
+      <Filter>Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\SphereCollider.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\LemonadeMachine.cpp">
+      <Filter>Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\Dominoes.cpp">
+      <Filter>Simulation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

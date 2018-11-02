@@ -3,7 +3,7 @@
 
 #define BAUMGARTE 0.2f
 #define VELOCITYSLOP 0.5f
-#define POSITIONSLOP 0.005f
+#define POSITIONSLOP 0.001f
 
 Contact::Contact(Body* A, Body* B, const glm::vec3& position, const glm::vec3& normal, const float penetration)
 	: A(A), B(B), position(position), normal(normal), penetration(penetration), impulseSumN(0.0f)
@@ -52,6 +52,10 @@ void Contact::CalculateBias()
 
 void Contact::SolveVelocities(Velocity& vA, Velocity& vB, const float dt = (1.0f/60.0f))
 {
+	float vSep = CalculateSeparatingVelocity();
+	if (vSep >= 0)
+		return;
+
 	float lambda, oldImpulse;
 	float uf = (A->GetFriction() + B->GetFriction()) * 0.5f;
 	float maxFriction;
@@ -72,7 +76,7 @@ void Contact::SolveVelocities(Velocity& vA, Velocity& vB, const float dt = (1.0f
 		lambda = CalculateLagrangian(JT[i], vA, vB, kt[i], 0.0f);
 
 		oldImpulse = impulseSumT[i];
-		maxFriction = uf * impulseSumN;
+		maxFriction = uf * impulseSumN; //uf * kt[i] * 9.8f;
 		impulseSumT[i] = glm::clamp(impulseSumT[i] + lambda, -maxFriction, maxFriction);
 		lambda = impulseSumT[i] - oldImpulse;
 

@@ -10,7 +10,7 @@ public:
 	Poly();
 
 	Poly(const std::vector<glm::vec3>& vertices, const std::vector<int>& indices)
-		:Model(vertices, indices)
+		: Model(vertices, indices)
 	{
 		primType = GL_TRIANGLES;
 	}

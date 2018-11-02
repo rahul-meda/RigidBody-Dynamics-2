@@ -9,6 +9,8 @@
 #include "Contact.h"
 #include "PositionJoint.h"
 #include "MouseJoint.h"
+#include "PlaneConstraint.h"
+#include "RevoluteJoint.h"
 
 class Poly;
 
@@ -46,7 +48,9 @@ protected:
 	std::vector<Collider*> colliders;
 	std::vector<Manifold> manifolds;
 	std::vector<PositionJoint> posJoints;
-	
+	std::vector<PlaneConstraint> planeConstraints;
+	std::vector<RevoluteJoint> revJoints;
+
 	MouseJoint mouseJoint;
 	bool picked;
 

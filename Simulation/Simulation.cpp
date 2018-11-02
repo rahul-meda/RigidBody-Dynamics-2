@@ -11,6 +11,7 @@
 #include "Mesh.h"
 #include "ObjParser.h"
 #include "PrimitiveQuery.h"
+#include "Line.h"
 
 #define MOUSE_SENSITIVITY 0.1
 #define FOV 45.0
@@ -226,6 +227,9 @@ void Simulation::Step(const float dt)
 			if (colliders[iA]->GetBody()->GetTag() == colliders[iB]->GetBody()->GetTag() && colliders[iA]->GetBody()->GetTag() != "")
 				continue;
 
+			if (colliders[iA]->GetBody()->GetInvMass() == 0.0f && colliders[iB]->GetBody()->GetInvMass() == 0.0f)
+				continue;
+
 			DetectCollision(manifolds, colliders[iA], colliders[iB]);
 		}
 	}
@@ -246,10 +250,14 @@ void Simulation::Step(const float dt)
 		}
 	}
 
-	for (auto joint : posJoints)
-	{
-		joint.Solve();
-	}
+	for (auto j : posJoints)
+		j.Solve();
+
+	for (auto c : planeConstraints)
+		c.Solve();
+
+	for (auto j : revJoints)
+		j.Solve();
 
 	if (picked)
 		mouseJoint.Solve();
@@ -274,7 +282,7 @@ void Simulation::Update()
 	}
 
 	// Graphics update
-	static glm::mat4 T(1), R(1), S(1), M(1), MVP(1);
+	static glm::mat4 T(1), R(1), S(1), M(1), VP(1), MVP(1);
 	glm::mat4 V = Camera::GetInstance().GetViewMatrix();
 	glm::mat4 P = Camera::GetInstance().GetProjectionMatrix();
 
@@ -288,32 +296,48 @@ void Simulation::Update()
 		for (auto contact : m.contacts)
 		{
 			T = glm::translate(contact.GetPosition());
-			S = glm::scale(glm::vec3(0.1f));
+			S = glm::scale(glm::vec3(0.03f));
 			M = T * S;
-			MVP = P * V * M;
+			VP = P * V;
+			MVP = VP * M;
 			boxModel->SetMVP(MVP);
 			boxModel->Render();
+
+			// tangents
+			/*std::vector<glm::vec3> verts = { contact.GetPosition(), contact.GetPosition() + contact.GetTangent(0) };
+			std::vector<int> ids = { 0, 1 };
+			Line* line = new Line(verts, ids);
+			line->SetMVP(VP);
+			line->SetColor(glm::vec3(0, 1, 0));
+			line->Render();
+			verts = { contact.GetPosition(), contact.GetPosition() + contact.GetTangent(1) };
+			line = new Line(verts, ids);
+			line->SetMVP(VP);
+			line->SetColor(glm::vec3(0, 1, 0));
+			line->Render();
+			delete line;*/
 		}
 	}
 
+	float s = 3.0f;
 	if (panLeft)
 	{
-		yaw += MOUSE_SENSITIVITY;
+		yaw += s * MOUSE_SENSITIVITY;
 		Camera::GetInstance().Rotate(yaw, pitch, 0);
 	}
 	if (panRight)
 	{
-		yaw -= MOUSE_SENSITIVITY;
+		yaw -= s * MOUSE_SENSITIVITY;
 		Camera::GetInstance().Rotate(yaw, pitch, 0);
 	}
 	if (panTop)
 	{
-		pitch -= MOUSE_SENSITIVITY;
+		pitch -= s * MOUSE_SENSITIVITY;
 		Camera::GetInstance().Rotate(yaw, pitch, 0);
 	}
 	if (panBot)
 	{
-		pitch += MOUSE_SENSITIVITY;
+		pitch += s * MOUSE_SENSITIVITY;
 		Camera::GetInstance().Rotate(yaw, pitch, 0);
 	}
 }

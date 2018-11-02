@@ -46,6 +46,7 @@ class Body
 {
 private:
 	float invMass;
+	glm::mat3 localInertia;
 	glm::mat3 localInvInertia;
 	glm::mat3 invInertia;
 
@@ -140,6 +141,8 @@ public:
 	void IntegrateVelocity(const float dt);
 
 	void IntegratePosition(const float dt);
+
+	glm::vec3 SolveGyroscopic(glm::vec3 w1, float dt);
 
 	void Update(const float dt);
 

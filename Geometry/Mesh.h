@@ -59,6 +59,8 @@ struct HMesh
 
 	void RemoveObselete();
 
+	void Scale(const glm::vec3& scale);
+
 	bool AreCoplanar(HFace* f1, HFace* f2);
 
 	// fix topological invaraints violated while merging

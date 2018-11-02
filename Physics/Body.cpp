@@ -7,16 +7,19 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 #include "HullCollider.h"
+#include "SphereCollider.h"
+#include "Geometry.h"
 
 #define GRAVITY 9.8f
 
 Body::Body()
 	:invMass(1.0),
+	localInertia(0),
 	localInvInertia(0),
 	invInertia(0),
 	density(1.0f),
 	restitution(0.3f),
-	friction(0.2f),
+	friction(0.4f),
 	position(0),
 	orientation(1, 0, 0, 0),
 	R(1),
@@ -97,6 +100,7 @@ float Body::GetFriction() const
 void Body::SetCentroid(const glm::vec3& c)
 {
 	centroid = c;
+	position = centroid - LocalToGlobalVec(localCentroid);
 }
 
 glm::vec3 Body::GetCentroid() const
@@ -155,8 +159,13 @@ std::vector<Collider*>& Body::GetColliders()
 void Body::SetModelData(const ModelData& m)
 {
 	model = new Model(m.vertices, m.indices);
-	frame = new Model(m.vertices, m.frameIndices);
-	frame->SetPrimitive(GL_LINES);
+	if (m.frameIndices.size() != 0)
+	{
+		frame = new Model(m.vertices, m.frameIndices);
+		frame->SetPrimitive(GL_LINES);
+	}
+	else
+		frame = nullptr;
 }
 
 void Body::SetColor(const glm::vec3& color)
@@ -219,6 +228,9 @@ void Body::AddCollider(Collider* collider)
 	case (Collider::Hull) :
 		static_cast<HullCollider*>(collider)->CalculateMass();
 		break;
+	case(Collider::Sphere) :
+		static_cast<SphereCollider*>(collider)->CalculateMass();
+		break;
 	}
 
 	float mass = 0.0f;		// mass of the body
@@ -237,7 +249,6 @@ void Body::AddCollider(Collider* collider)
 	localCentroid *= invMass;
 	centroid = LocalToGlobalPoint(localCentroid);
 
-	glm::mat3 inertiaLocal(0);
 	for (Collider* c : colliders)
 	{
 		glm::vec3 r = localCentroid - c->GetCentroid();
@@ -246,10 +257,10 @@ void Body::AddCollider(Collider* collider)
 
 		// Parallel axis theorem
 		// Accumulate local inertia tensors
-		inertiaLocal += c->GetInertia() + c->GetMass() * (rDotr * glm::mat3(1.0) - rOutr);
+		localInertia += c->GetInertia() + c->GetMass() * (rDotr * glm::mat3(1.0) - rOutr);
 	}
 
-	localInvInertia = glm::inverse(inertiaLocal);
+	localInvInertia = glm::inverse(localInertia);
 }
 
 void Body::ApplyForce(const glm::vec3& force)
@@ -287,6 +298,23 @@ void Body::IntegratePosition(const float dt)
 	position = centroid - LocalToGlobalVec(localCentroid);
 }
 
+glm::vec3 Body::SolveGyroscopic(glm::vec3 w1, float dt)
+{
+	glm::vec3 wb = GlobalToLocalVec(w1);
+
+	// error term
+	glm::vec3 f = dt * glm::cross(wb, localInertia * wb);
+
+	// Jacobian
+	glm::mat3 J = localInertia + dt * (Skew(wb) * localInertia - Skew(localInertia * wb));
+	glm::mat3 invJ = glm::inverse(J);
+
+	// Newton-Raphson
+	wb -= invJ * f;
+
+	return wb;
+}
+
 void Body::Update(const float dt)
 {
 	if (invMass == 0.0)
@@ -297,6 +325,17 @@ void Body::Update(const float dt)
 	velocity += invMass * forceSum * dt;
 	velocity += GRAVITY * (glm::vec3(0, -1, 0)) * dt;
 	angularVelocity += invInertia * torqueSum * dt;
+
+	/*glm::vec3 dw1 = invInertia * torqueSum * dt;
+	glm::vec3 w2 = SolveGyroscopic(angularVelocity, dt);
+	glm::vec3 dw2 = -dt * localInvInertia * glm::cross(w2, localInertia*w2);
+	dw2 = LocalToGlobalVec(dw2);
+
+	angularVelocity += dw1 + dw2;*/
+
+	// damping?
+	/*velocity *= 0.9999f;
+	angularVelocity *= 0.9999f;*/
 
 	forceSum = glm::vec3(0);
 	torqueSum = glm::vec3(0);
@@ -325,7 +364,10 @@ void Body::Render()
 	model->SetColor(color);
 	model->Render();
 
-	frame->SetMVP(MVP);
-	frame->SetColor(glm::vec3(0.9));
-	frame->Render();
+	if (frame != nullptr)
+	{
+		frame->SetMVP(MVP);
+		frame->SetColor(glm::vec3(0.9));
+		frame->Render();
+	}
 }

@@ -27,7 +27,6 @@ public:
 	Collider()
 		:mass(0),
 		inertia(0),
-		shape(Hull),
 		centroid(0)
 	{}
 

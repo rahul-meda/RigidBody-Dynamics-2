@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include "Contact.h"
 #include "HullCollider.h"
+#include "SphereCollider.h"
 
 // detect collision b/w colliders
 // and generate detailed collision data
@@ -60,6 +61,62 @@ int FindIncidentFace(HullCollider* incident, HullCollider* reference, int refere
 // Sutherland Hodgman - Ref: Orange book
 void CreateFaceContact(std::vector<Manifold>& manifolds, HullCollider* incident, HullCollider* reference, int incidentFace, int referenceFace);
 
-void DetectHullvsHull(std::vector<Manifold>& manifolds, HullCollider* A, HullCollider* B);
+void DetectHullVsHull(std::vector<Manifold>& manifolds, HullCollider* A, HullCollider* B);
+
+void DetectSphereVsSphere(std::vector<Manifold>& manifolds, SphereCollider* A, SphereCollider* B);
+
+void DetectSphereVsHull(std::vector<Manifold>& manifolds, SphereCollider* A, HullCollider* B);
 
 void DetectCollision(std::vector<Manifold>& manifolds, Collider* A, Collider* B);
+
+// GJK to find the closest points of approach between two non-overlapping convex shapes
+// Note: This can be used later as a pre-step before running SAT to optimise narrowphase collision detection 
+static std::pair<glm::vec3, glm::vec3> GJKDistance(Collider* A, Collider* B);
+
+// Helper to hold vertex data (subset of the shape)
+// Only vertices inside DistanceProxy are considered for distance computation
+struct DistanceProxy
+{
+private:
+	std::vector<glm::vec3> vertices;
+
+public:
+	void SetProxy(Collider* collider);
+
+	int GetSupport(const glm::vec3& dir) const;
+
+	glm::vec3 GetVertex(int i) const;
+};
+
+// A vertex on the simplex
+struct SimplexVertex
+{
+	glm::vec3 pointA;	// support on collider A
+	glm::vec3 pointB;	// support on collider B
+	glm::vec3 point;	// support on the minkowski sum
+	float weight;		// barycentric weight of the point
+	int indexA;			// index of point A on collider A
+	int indexB;			// index of point B on collider B
+};
+
+// A generic simplex (can be point, line, triangle, or tetrahedron)
+struct Simplex
+{
+	SimplexVertex vertices[4];	// simplex vertices
+	int nVerts;					// number of vertices on the simplex (1 - 4)
+
+	// Find a search direction to evolve the simplex
+	glm::vec3 FindSearchDirection() const;
+
+	// Find closest point on the simplex to the origin
+	glm::vec3 FindClosestPoint() const;
+
+	// Calculate closest points on the colliders, using the barycentric weights of simplex vertices
+	void CalculateClosestPoints(glm::vec3& pA, glm::vec3& pB);
+
+	// Calculate the barycentric weights of the closest point on simplex to origin
+	// Find the Voronoi region of the origin, and reduce the simplex if required
+	void Solve2();	// Simplex is a segment
+	void Solve3();	// Simplex is a triangle
+	void Solve4();	// Simplex is a tetrahedron
+};

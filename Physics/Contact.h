@@ -59,6 +59,8 @@ public:
 	Body* GetBodyA() const { return A; }
 	Body* GetBodyB() const { return B; }
 
+	glm::vec3 GetTangent(int i) const { return tangent[i]; }
+
 	// Solves the contact by applying impulses
 	void SolveVelocities(Velocity& A, Velocity& B, const float dt);
 
