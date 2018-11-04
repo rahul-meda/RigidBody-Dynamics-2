@@ -80,7 +80,7 @@ private:
 	Model* model;
 	Model* frame;
 	glm::vec3 color;
-	std::string tag;
+	int group;
 
 public:
 	Body();
@@ -132,8 +132,8 @@ public:
 
 	void SetColor(const glm::vec3& color);
 
-	void SetTag(const std::string& s);
-	std::string GetTag() const;
+	void SetGroup(const int s);
+	int GetGroup() const;
 
 	const glm::vec3 LocalToGlobalVec(const glm::vec3& v) const;
 

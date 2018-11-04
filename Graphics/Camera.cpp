@@ -1,13 +1,15 @@
 
-#define CAM_SPEED 25.0f
+#define MAX_SPEED 10.0f
+#define ACCELERATION 5.0f
 #define DAMPING 0.97f
 #define SPEED_EPSILON 0.79f
 
 #include "Camera.h"
 #include <glm/gtx/euler_angles.hpp>
+#include <glm/glm.hpp>
 
 Camera::Camera()
-	:position(0.0), R(1.0), V(1.0), P(1.0)
+	:position(0.0), velocity(0), R(1.0), V(1.0), P(1.0)
 {
 }
 
@@ -56,9 +58,15 @@ void Camera::Move(const glm::vec3& dir)
 {
 	const static float dt = 1.0f / 60.0f;
 
-	position += CAM_SPEED*dt*dir*DAMPING;
+	velocity += ACCELERATION * dir * dt;
+	velocity *= DAMPING;
 
-	Update();
+	if (glm::dot(velocity, velocity) > 100.0f)
+		velocity = MAX_SPEED * dir;
+	
+	position += velocity*dt;
+
+	//Update();
 }
 
 const glm::vec3 Camera::GetCamX() const
@@ -100,11 +108,19 @@ void Camera::Rotate(const float yaw, const float pitch, const float roll)
 
 	R = glm::yawPitchRoll(y, p, r);
 
-	Update();
+	//Update();
 }
 
 void Camera::Update(glm::vec3 t)
 {
+	const static float dt = 1.0f / 60.0f;
+	float v2 = glm::dot(velocity, velocity);
+	if (v2 > 0.5f)
+	{
+		velocity *= DAMPING;
+		position += velocity * dt;
+	}
+
 	// camera z-axis
 	look = glm::normalize(glm::vec3(R*glm::vec4(0, 0, -1, 0)));
 

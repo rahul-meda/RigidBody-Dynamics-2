@@ -53,6 +53,7 @@ private:
 
 	// camera position
 	glm::vec3 position;
+	glm::vec3 velocity;
 
 	// camrea rotation matrix
 	glm::mat4 R;

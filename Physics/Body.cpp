@@ -34,7 +34,7 @@ Body::Body()
 	forceSum(0),
 	torqueSum(0),
 	color(0.4, 0.9, 0.1),
-	tag("")
+	group(0)
 {}
 
 void Body::SetMass(const float m)
@@ -220,14 +220,14 @@ void Body::SetColor(const glm::vec3& color)
 	this->color = color;
 }
 
-void Body::SetTag(const std::string& s)
+void Body::SetGroup(const int g)
 {
-	tag = s;
+	group = g;
 }
 
-std::string Body::GetTag() const
+int Body::GetGroup() const
 {
-	return tag;
+	return group;
 }
 
 const glm::vec3 Body::LocalToGlobalVec(const glm::vec3& v) const

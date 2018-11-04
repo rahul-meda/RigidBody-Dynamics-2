@@ -42,7 +42,7 @@ void CompositeBodyTest::OnInit(GLFWwindow* window)
 	body.SetOrientation(glm::angleAxis(0.0f, glm::vec3(0, 0, 1)));
 	body.SetCanSleep(false);
 	body.SetColor(glm::vec3(0.4, 0.9, 0.1));
-	body.SetTag("teapot");
+	body.SetGroup(1);
 	bodies.push_back(body);
 	std::vector<HMesh> meshes;
 	ParseObj("resources/teapot_hulls_normalized.obj", meshes, true);

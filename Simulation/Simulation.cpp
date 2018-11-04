@@ -233,17 +233,19 @@ void Simulation::Step(const float dt)
 	{
 		for (int iB = iA + 1; iB < colliders.size(); iB++)
 		{
-			if (colliders[iA]->GetBody()->GetTag() == colliders[iB]->GetBody()->GetTag() && colliders[iA]->GetBody()->GetTag() != "")
-				continue;
+			if (colliders[iA]->GetBody()->GetGroup() != 0)
+			{
+				if (colliders[iA]->GetBody()->GetGroup() == colliders[iB]->GetBody()->GetGroup())
+					continue;
+			}
 
 			if (colliders[iA]->GetBody()->GetInvMass() == 0.0f && colliders[iB]->GetBody()->GetInvMass() == 0.0f)
 				continue;
 
-			if (colliders[iA]->GetShape() == Collider::Sphere || colliders[iB]->GetShape() == Collider::Sphere)
-			{
-				if (colliders[iA]->GetBody()->GetTag() == "teapot" || colliders[iB]->GetBody()->GetTag() == "teapot")
-					continue;
-			}
+			if (colliders[iA]->GetShape() == Collider::Sphere && colliders[iB]->GetBody()->GetGroup() == 1)
+				continue;
+			if (colliders[iB]->GetShape() == Collider::Sphere && colliders[iA]->GetBody()->GetGroup() == 1)
+				continue;
 
 			DetectCollision(manifolds, colliders[iA], colliders[iB]);
 		}
@@ -409,6 +411,8 @@ void Simulation::Update()
 		pitch += s * MOUSE_SENSITIVITY;
 		Camera::GetInstance().Rotate(yaw, pitch, 0);
 	}
+
+	Camera::GetInstance().Update();
 }
 
 Simulation::~Simulation()

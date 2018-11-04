@@ -55,7 +55,7 @@ void FractureTest::OnInit(GLFWwindow* window)
 	body.SetOrientation(glm::angleAxis(0.0f, glm::vec3(0, 0, 1)));
 	body.SetVelocity(glm::vec3(0));
 	body.SetColor(glm::vec3(0.4, 0.9, 0.1));
-	body.SetTag("teapot");
+	body.SetGroup(1);
 	bodies.push_back(body);
 	std::vector<HMesh> meshes;
 	ParseObj("resources/teapot_hulls_normalized.obj", meshes, true);
@@ -126,7 +126,7 @@ void FractureTest::Update()
 		{
 			for (auto c : m.contacts)
 			{
-				if (c.GetBodyA()->GetTag() == "teapot" || c.GetBodyB()->GetTag() == "teapot")
+				if (c.GetBodyA()->GetGroup() == 1 || c.GetBodyB()->GetGroup() == 1)
 				{
 					if (c.GetBodyA()->GetMass() != 0 && c.GetBodyB()->GetMass() != 0)
 						shatter = true;
@@ -164,7 +164,7 @@ void FractureTest::Update()
 			position = b.LocalToGlobalPoint(position);
 			body.SetPosition(position);
 			body.SetOrientation(b.GetOrientation());
-			body.SetTag("teapot");
+			body.SetGroup(1);
 			bodies.push_back(body);
 			bodies.back().AddCollider(c);
 		}

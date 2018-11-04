@@ -506,7 +506,7 @@ void LemonadeMachine::OnInit(GLFWwindow* window)
 	body.SetOrientation(glm::angleAxis(0.0f, glm::vec3(0, 0, 1.0)));
 	body.SetCanSleep(false);
 	body.SetColor(glm::vec3(0.9, 0.6, 0.4));
-	body.SetTag("breakable");
+	body.SetGroup(2);
 	bodies.push_back(body);
 	bodies.back().AddCollider(collider);
 	colliders.push_back(collider);
@@ -524,7 +524,7 @@ void LemonadeMachine::OnInit(GLFWwindow* window)
 		body.SetOrientation(glm::angleAxis(0.0f, glm::vec3(0, 0, 1.0)));
 		body.SetCanSleep(false);
 		body.SetColor(glm::vec3(0.9, 0.6, 0.4));
-		body.SetTag("");
+		body.SetGroup(0);
 		bodies.push_back(body);
 		bodies.back().AddCollider(collider);
 		colliders.push_back(collider);
@@ -558,7 +558,7 @@ void LemonadeMachine::OnInit(GLFWwindow* window)
 	body.SetOrientation(glm::angleAxis(0.0f, glm::vec3(0, 0, 1)));
 	body.SetCanSleep(true);
 	body.SetColor(glm::vec3(0.4, 0.9, 0.1));
-	body.SetTag("teapot");
+	body.SetGroup(1);
 	bodies.push_back(body);
 	std::vector<HMesh> meshes;
 	ParseObj("resources/teapot_hulls_normalized.obj", meshes, true);
@@ -620,7 +620,7 @@ void LemonadeMachine::Update()
 		{
 			for (auto c : m.contacts)
 			{
-				if (c.GetBodyA()->GetTag() == "breakable" || c.GetBodyB()->GetTag() == "breakable")
+				if (c.GetBodyA()->GetGroup() == 2 || c.GetBodyB()->GetGroup() == 2)
 				{
 					posJoints.pop_back();
 					done = true;
@@ -638,7 +638,7 @@ void LemonadeMachine::Update()
 		{
 			for (auto c : m.contacts)
 			{
-				if (c.GetBodyA()->GetTag() == "teapot" || c.GetBodyB()->GetTag() == "teapot")
+				if (c.GetBodyA()->GetGroup() == 1 || c.GetBodyB()->GetGroup() == 1)
 				{
 					if (c.GetBodyA()->GetMass() != 0 && c.GetBodyB()->GetMass() != 0)
 					{
@@ -680,7 +680,7 @@ void LemonadeMachine::Update()
 			position = b.LocalToGlobalPoint(position);
 			body.SetPosition(position);
 			body.SetOrientation(b.GetOrientation());
-			body.SetTag("teapot");
+			body.SetGroup(1);
 			bodies.push_back(body);
 			bodies.back().AddCollider(c);
 		}
