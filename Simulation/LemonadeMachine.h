@@ -12,6 +12,8 @@ public:
 
 	void OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods);
 
+	void Update();
+
 private:
 	LemonadeMachine() {};
 };

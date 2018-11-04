@@ -5,7 +5,7 @@
 #include <vector>
 #include "Simulation/Simulations.h"
 
-Simulation* sim = &Dominoes::GetInstance();
+Simulation* sim = &LemonadeMachine::GetInstance();
 
 void OnWindowResize(GLFWwindow* window, int width, int height)
 {

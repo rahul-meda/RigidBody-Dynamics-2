@@ -25,25 +25,26 @@ void RevoluteJointTest::OnInit(GLFWwindow* window)
 	mesh.GetModelData(model);
 	collider = new HullCollider(mesh);
 	body.SetModelData(model);
-	body.SetPosition(glm::vec3(0, 0.0, 0));
-	body.SetMass(1.0f);
+	body.SetPosition(glm::vec3(0, -10.0, 0));
+	body.SetMass(0.0f);
 	body.SetColor(glm::vec3(0.7, 0.7, 0.6));
 	bodies.push_back(body);
 	bodies.back().AddCollider(collider);
 	colliders.push_back(collider);
 
 	ParseObj("resources/box.obj", mesh);
+	mesh.Scale(glm::vec3(0.25f, 0.05f, 0.7f));
 	mesh.GetModelData(model);
 	collider = new HullCollider(mesh);
 	body.SetModelData(model);
-	body.SetPosition(glm::vec3(0, -30.0, 0));
-	body.SetMass(0.0f);
-	body.SetColor(glm::vec3(0.5, 0.5, 0.9));
+	body.SetPosition(glm::vec3(1.0f, 0.5f, -0.3f));
+	body.SetMass(1.0f);
+	body.SetOrientation(glm::angleAxis(0.0f, glm::vec3(0, 0, 1)));
+	body.SetColor(glm::vec3(0.9, 0.6, 0.4));
 	bodies.push_back(body);
 	bodies.back().AddCollider(collider);
 	colliders.push_back(collider);
-
-	RevoluteJoint rj(&bodies[0], &bodies[1], glm::vec3(0,-1.0f,0) , glm::vec3(0,0,-1.0f));
+	RevoluteJoint rj(&bodies[1], &bodies[0], glm::vec3(1.0f, 0.5f, -0.3f), glm::vec3(1.0f, 0, 0));
 	revJoints.push_back(rj);
 }
 

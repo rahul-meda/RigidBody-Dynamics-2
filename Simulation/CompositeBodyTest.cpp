@@ -4,6 +4,7 @@
 #include "Poly.h"
 #include "HullCollider.h"
 #include "Collider.h"
+#include "SphereCollider.h"
 
 CompositeBodyTest& CompositeBodyTest::GetInstance()
 {
@@ -25,26 +26,29 @@ void CompositeBodyTest::OnInit(GLFWwindow* window)
 	mesh.GetModelData(model);
 	collider = new HullCollider(mesh);
 	body.SetModelData(model);
-	body.SetPosition(glm::vec3(0, -10.0, 0));
+	body.SetPosition(glm::vec3(0, 0, 0));
 	body.SetMass(0.0f);
 	body.SetColor(glm::vec3(0.7, 0.7, 0.6));
 	bodies.push_back(body);
 	bodies.back().AddCollider(collider);
 	colliders.push_back(collider);
 
-	ParseObj("resources/teapot.obj", mesh);
+	ParseObj("resources/teapot_normalized.obj", mesh);
+	mesh.Scale(glm::vec3(3.0f));
 	mesh.GetModelData(model);
 	body.SetModelData(model);
-	body.SetPosition(glm::vec3(0.0, 0.0, 0.0));
+	body.SetPosition(glm::vec3(0.0, 1.75, 0.0));
 	body.SetMass(1.0f);
-	body.SetOrientation(glm::angleAxis(0.78f, glm::vec3(0, 0, 1)));
+	body.SetOrientation(glm::angleAxis(0.0f, glm::vec3(0, 0, 1)));
+	body.SetCanSleep(false);
 	body.SetColor(glm::vec3(0.4, 0.9, 0.1));
 	body.SetTag("teapot");
 	bodies.push_back(body);
 	std::vector<HMesh> meshes;
-	ParseObj("resources/teapot_hulls.obj", meshes, true);
+	ParseObj("resources/teapot_hulls_normalized.obj", meshes, true);
 	for (int i = 0; i < meshes.size(); i++)
 	{
+		meshes[i].Scale(glm::vec3(3.0f));
 		collider = new HullCollider(meshes[i]);
 		bodies.back().AddCollider(collider);
 		colliders.push_back(collider);
@@ -86,7 +90,7 @@ void CompositeBodyTest::OnKeyInput(GLFWwindow* window, int key, int code, int ac
 	}
 	if (keys[GLFW_KEY_V])
 	{
-		bodies[1].SetAngularVelocity(glm::vec3(0, 0, 1.0));
+		bodies[1].SetAngularVelocity(glm::vec3(0, 0, -2.0));
 	}
 	if (keys[GLFW_KEY_B])
 	{

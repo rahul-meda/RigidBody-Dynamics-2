@@ -27,5 +27,9 @@ void ComputeBasis(const glm::vec3& i, glm::vec3& j, glm::vec3& k);
 
 void CreateSphere(const float radius, ModelData& model);
 
+void CreateHemiSphere(const float radius, ModelData& model);
+
+void CreateLine(const glm::vec3& p1, const glm::vec3& p2, ModelData& model);
+
 // builds a skew symmetric matrix from the vector
 glm::mat3 Skew(const glm::vec3& v);

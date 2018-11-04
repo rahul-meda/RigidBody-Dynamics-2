@@ -55,6 +55,9 @@ protected:
 	bool picked;
 
 	Poly* boxModel;
+	Model* cylinder;
+	Model* sphere;
+	Model* hemiSphere;
 
 public:
 	Simulation();

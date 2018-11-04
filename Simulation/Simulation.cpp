@@ -55,6 +55,15 @@ void Simulation::OnInit(GLFWwindow* window)
 	boxModel = new Poly(vertices, indices);
 	boxModel->SetColor(glm::vec3(1.0, 0, 0));
 
+	ModelData model;
+	ParseObj("resources/cylinder.obj", mesh);
+	mesh.GetModelData(model);
+	cylinder = new Model(model.vertices, model.indices);
+	CreateSphere(1.0, model);
+	sphere = new Model(model.vertices, model.indices);
+	CreateHemiSphere(1.0, model);
+	hemiSphere = new Model(model.vertices, model.indices);
+
 	// reserving space for global data
 	// otherwise any pointers or references to container elements will get invalidated on using push_back
 	// because push_back reallocates memory, and old memory locations are invalidated
@@ -230,6 +239,12 @@ void Simulation::Step(const float dt)
 			if (colliders[iA]->GetBody()->GetInvMass() == 0.0f && colliders[iB]->GetBody()->GetInvMass() == 0.0f)
 				continue;
 
+			if (colliders[iA]->GetShape() == Collider::Sphere || colliders[iB]->GetShape() == Collider::Sphere)
+			{
+				if (colliders[iA]->GetBody()->GetTag() == "teapot" || colliders[iB]->GetBody()->GetTag() == "teapot")
+					continue;
+			}
+
 			DetectCollision(manifolds, colliders[iA], colliders[iB]);
 		}
 	}
@@ -250,8 +265,11 @@ void Simulation::Step(const float dt)
 		}
 	}
 
-	for (auto j : posJoints)
-		j.Solve();
+	for (int i = 0; i < 20; i++)
+	{
+		for (auto j : posJoints)
+			j.Solve();
+	}
 
 	for (auto c : planeConstraints)
 		c.Solve();
@@ -283,8 +301,10 @@ void Simulation::Update()
 
 	// Graphics update
 	static glm::mat4 T(1), R(1), S(1), M(1), VP(1), MVP(1);
+	ModelData model;
 	glm::mat4 V = Camera::GetInstance().GetViewMatrix();
 	glm::mat4 P = Camera::GetInstance().GetProjectionMatrix();
+	VP = P * V;
 
 	for (auto b : bodies)
 	{
@@ -298,10 +318,9 @@ void Simulation::Update()
 			T = glm::translate(contact.GetPosition());
 			S = glm::scale(glm::vec3(0.03f));
 			M = T * S;
-			VP = P * V;
 			MVP = VP * M;
-			boxModel->SetMVP(MVP);
-			boxModel->Render();
+			sphere->SetMVP(MVP);
+			sphere->Render();
 
 			// tangents
 			/*std::vector<glm::vec3> verts = { contact.GetPosition(), contact.GetPosition() + contact.GetTangent(0) };
@@ -317,6 +336,56 @@ void Simulation::Update()
 			line->Render();
 			delete line;*/
 		}
+	}
+
+	for (auto j : revJoints)
+	{
+		T = glm::translate(j.GetAnchor());
+		glm::vec3 axis = j.GetAxis();
+		if (axis.x > 0.9f)
+			R = glm::toMat4(glm::angleAxis(1.57f, glm::vec3(0,0,1.0)));
+		else if (axis.z > 0.9f)
+			R = glm::toMat4(glm::angleAxis(1.57f, glm::vec3(1.0, 0, 0)));
+		else
+			R = glm::mat4(1.0);
+		S = glm::scale(glm::vec3(0.05, 0.3, 0.05));
+		cylinder->SetMVP(VP * T * R * S);
+		cylinder->SetColor(glm::vec3(0.7, 0.7, 0.6));
+		cylinder->Render();
+	}
+
+	for (auto j : posJoints)
+	{
+		glm::vec3 p1 = j.GetAnchorA();
+		glm::vec3 p2 = j.GetBodyA()->GetCentroid();
+		M = glm::translate(p1) * glm::scale(glm::vec3(0.0125f));
+		MVP = VP * M;
+		sphere->SetColor(glm::vec3(1, 0, 0));
+		sphere->SetMVP(MVP);
+		sphere->Render();
+		/*CreateLine(p1, p2, model);
+		Model* line = new Model(model.vertices, model.indices);
+		line->SetPrimitive(GL_LINES);
+		line->SetMVP(VP);
+		line->SetColor(glm::vec3(1, 0, 0));
+		line->Render();*/
+
+		p1 = j.GetAnchorB();
+		p2 = j.GetBodyB()->GetCentroid();
+		glm::quat q = j.GetBodyB()->GetOrientation();
+		//R = glm::toMat4(q) * glm::rotate(-1.5714f, glm::vec3(0, 0, 1));
+		M = glm::translate(p1) * R * glm::scale(glm::vec3(0.025f));
+		MVP = VP * M;
+		hemiSphere->SetColor(glm::vec3(0.643, 0.827, 0.435));
+		hemiSphere->SetMVP(MVP);
+		hemiSphere->Render();
+		/*CreateLine(p1, p2, model);
+		line = new Model(model.vertices, model.indices);
+		line->SetPrimitive(GL_LINES);
+		line->SetMVP(VP);
+		line->SetColor(glm::vec3(0.643, 0.827, 0.435));
+		line->Render();
+		delete line;*/
 	}
 
 	float s = 3.0f;

@@ -33,34 +33,33 @@ void Dominoes::OnInit(GLFWwindow* window)
 	bodies.back().AddCollider(collider);
 	colliders.push_back(collider);
 
-	int N = 9;
-	glm::vec3 s(0.05, 0.25, 0.1);
-	s *= 2.0f;
-	float g = 0.1f;
-	g *= 3.0f;
-	for (int i = 0; i < 1; i++)
+	int N = 3;
+	glm::vec3 s(0.2f, 0.5f, 0.05f);
+	float g = 0.5f;
+	for (int i = 0; i < N; i++)
 	{
 		ParseObj("resources/box.obj", mesh);
 		mesh.Scale(s);
 		mesh.GetModelData(model);
 		collider = new HullCollider(mesh);
 		body.SetModelData(model);
-		body.SetPosition(glm::vec3(-(g+2.0f*s.x)*(float)(i), s.y, 0));
+		body.SetPosition(glm::vec3(0, s.y, -g*(float)i));
 		body.SetMass(1.0f);
 		body.SetOrientation(glm::angleAxis(0.0f, glm::vec3(0, 0, 1.0)));
-		body.SetFriction(0.7f);
+		//body.SetFriction(0.7f);
+		//body.SetRestitution(0.9f);
 		body.SetColor(glm::vec3(0.9, 0.6, 0.4));
 		bodies.push_back(body);
 		bodies.back().AddCollider(collider);
 		colliders.push_back(collider);
 	}
 
-	/*float radius = 0.1f;
+	float radius = 0.1f;
 	CreateSphere(radius, model);
 	body.SetModelData(model);
-	body.SetPosition(glm::vec3(1.0, 1.0, 0.0));
+	body.SetPosition(glm::vec3(0.1, 1.0, 1.0));
 	body.SetOrientation(glm::angleAxis(0.0f, glm::vec3(0, 0, 1)));
-	body.SetVelocity(glm::vec3(-7.0,0,0));
+	body.SetVelocity(glm::vec3(0,0,-3.0));
 	body.SetMass(1.0f);
 	body.SetColor(glm::vec3(1.0, 0.9, 0.3));
 	bodies.push_back(body);
@@ -68,10 +67,10 @@ void Dominoes::OnInit(GLFWwindow* window)
 	bodies.back().AddCollider(collider);
 	colliders.push_back(collider);
 
-	radius = 0.1f;
+	/*radius = 0.1f;
 	CreateSphere(radius, model);
 	body.SetModelData(model);
-	body.SetPosition(glm::vec3(-5.5, 1.0, 0.0));
+	body.SetPosition(glm::vec3(0, 1.0, -1.0));
 	body.SetOrientation(glm::angleAxis(0.0f, glm::vec3(0, 0, 1)));
 	body.SetVelocity(glm::vec3(7.0, 0, 0));
 	body.SetMass(1.0f);

@@ -107,6 +107,24 @@ void Manifold::SolveVelocities()
 	assert(contacts.size() > 0);
 	Body* A = contacts[0].A;
 	Body* B = contacts[0].B;
+
+	if (A->GetMass() != 0 && B->GetMass() != 0)
+	{
+		if (A->IsAwake() ^ B->IsAwake())
+		{
+			if (A->IsAwake())
+				B->SetAwake(true);
+			else
+				A->SetAwake(true);
+		}
+	}
+
+	// temp hack - without this things blow up after everything comes to rest state
+	if (!A->IsAwake())
+		A->SetAwake(false);
+	if (!B->IsAwake())
+		B->SetAwake(false);
+
 	glm::vec3 v1 = A->GetVelocity();
 	glm::vec3 w1 = A->GetAngularVelocity();
 	glm::vec3 v2 = B->GetVelocity();

@@ -6,6 +6,9 @@
 #define LINE_WIDTH 3.0f
 #define POINT_SIZE 5.0f
 
+Model::Model() 
+{}
+
 Model::Model(const std::vector<glm::vec3>& vertices, const std::vector<int>& indices)
 	: vertices(vertices), indices(indices), primType(GL_TRIANGLES), color(0.4, 0.9, 0.1)
 {

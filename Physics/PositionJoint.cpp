@@ -3,7 +3,7 @@
 #include "ConstraintCommon.h"
 
 PositionJoint::PositionJoint(Body* A, Body* B, const glm::vec3& anchor)
-	: A(A), B(B)
+	: A(A), B(B), lambdaSum(0)
 {
 	localAnchorA = A->GlobalToLocalPoint(anchor);
 	localAnchorB = B->GlobalToLocalPoint(anchor);
@@ -20,6 +20,40 @@ float PositionJoint::CalculateBias(float correction)
 	const static float inv_dt = 60.0f;
 
 	return (B * inv_dt * correction);
+}
+
+glm::vec3 PositionJoint::GetReactionForce() const
+{
+	glm::vec3 anchorA = A->LocalToGlobalPoint(localAnchorA);
+	glm::vec3 anchorB = B->LocalToGlobalPoint(localAnchorB);
+	glm::vec3 dir = anchorB - anchorA;
+	float l2 = glm::length2(dir);
+	if (l2 == 0)
+		dir = glm::vec3(0);
+	else
+		dir /= std::sqrtf(l2);
+	glm::vec3 reactionForce = (lambdaSum) * dir * 60.0f;
+	return reactionForce;
+}
+
+glm::vec3 PositionJoint::GetAnchorA() const
+{
+	return A->LocalToGlobalPoint(localAnchorA);
+}
+
+glm::vec3 PositionJoint::GetAnchorB() const
+{
+	return B->LocalToGlobalPoint(localAnchorB);
+}
+
+Body* PositionJoint::GetBodyA() const
+{
+	return A;
+}
+
+Body* PositionJoint::GetBodyB() const
+{
+	return B;
 }
 
 void PositionJoint::Solve()
@@ -48,6 +82,8 @@ void PositionJoint::Solve()
 	float lambda1 = CalculateLagrangian(J1, A, B, effMass1, bias1);
 	float lambda2 = CalculateLagrangian(J2, A, B, effMass2, bias2);
 	float lambda3 = CalculateLagrangian(J3, A, B, effMass3, bias3);
+
+	lambdaSum += lambda1 + lambda2 + lambda3;
 
 	ApplyImpulse(J1, A, B, lambda1);
 	ApplyImpulse(J2, A, B, lambda2);

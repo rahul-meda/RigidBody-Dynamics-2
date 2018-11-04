@@ -63,6 +63,15 @@ private:
 	glm::vec3 velocity;
 	glm::vec3 angularVelocity;
 
+	// tracks how much the body has moved in recent frames
+	float motion;
+
+	// sleeping objects are skipped from integration
+	bool awake;
+
+	// some objects should never sleep
+	bool canSleep;
+
 	glm::vec3 forceSum;
 	glm::vec3 torqueSum;
 
@@ -81,6 +90,8 @@ public:
 
 	void SetInvMass(const float m);
 	float GetInvMass() const;
+
+	bool IsStatic() const;
 
 	void SetInertia(const glm::mat3& inertia);
 	glm::mat3 GetInvInertia() const;
@@ -108,6 +119,12 @@ public:
 
 	void SetAngularVelocity(const glm::vec3& w);
 	glm::vec3 GetAngularVelocity() const;
+
+	void SetAwake(const bool state);
+	bool IsAwake() const;
+	
+	void SetCanSleep(const bool state);
+	bool CanSleep() const;
 
 	std::vector<Collider*>& GetColliders();
 

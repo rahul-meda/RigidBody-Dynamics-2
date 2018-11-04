@@ -11,6 +11,9 @@
 #include "Geometry.h"
 
 #define GRAVITY 9.8f
+#define SLEEP_EPSILON2 0.16f
+#define SLEEP_EPSILON_MAX 1.0f
+#define MAX_VELOCITY2 400.0f
 
 Body::Body()
 	:invMass(1.0),
@@ -25,6 +28,9 @@ Body::Body()
 	R(1),
 	velocity(0),
 	angularVelocity(0),
+	motion(5.0f*SLEEP_EPSILON2),
+	awake(true),
+	canSleep(true),
 	forceSum(0),
 	torqueSum(0),
 	color(0.4, 0.9, 0.1),
@@ -34,9 +40,15 @@ Body::Body()
 void Body::SetMass(const float m)
 {
 	if (m == 0)	// static body
+	{
 		invMass = 0;
+		awake = false;
+	}
 	else
+	{
 		invMass = 1.0f / m;
+		awake = true;
+	}
 }
 
 float Body::GetMass() const
@@ -55,6 +67,11 @@ void Body::SetInvMass(const float im)
 float Body::GetInvMass() const
 {
 	return invMass;
+}
+
+bool Body::IsStatic() const
+{
+	return invMass == 0;
 }
 
 void Body::SetInertia(const glm::mat3& inertia)
@@ -149,6 +166,36 @@ void Body::SetAngularVelocity(const glm::vec3& w)
 glm::vec3 Body::GetAngularVelocity() const
 {
 	return angularVelocity;
+}
+
+void Body::SetAwake(const bool state)
+{
+	awake = state;
+	
+	if (awake)
+	{
+		motion = 5.0f * SLEEP_EPSILON2;
+	}
+	else
+	{
+		velocity = glm::vec3(0.0f);
+		angularVelocity = glm::vec3(0.0f);
+	}
+}
+
+bool Body::IsAwake() const
+{
+	return awake;
+}
+
+void Body::SetCanSleep(const bool state)
+{
+	canSleep = state;
+}
+
+bool Body::CanSleep() const
+{
+	return canSleep;
 }
 
 std::vector<Collider*>& Body::GetColliders()
@@ -320,6 +367,9 @@ void Body::Update(const float dt)
 	if (invMass == 0.0)
 		return;
 
+	if (!awake)
+		return;
+
 	invInertia = glm::transpose(R) * localInvInertia * R;
 
 	velocity += invMass * forceSum * dt;
@@ -333,10 +383,6 @@ void Body::Update(const float dt)
 
 	angularVelocity += dw1 + dw2;*/
 
-	// damping?
-	/*velocity *= 0.9999f;
-	angularVelocity *= 0.9999f;*/
-
 	forceSum = glm::vec3(0);
 	torqueSum = glm::vec3(0);
 
@@ -347,6 +393,26 @@ void Body::Update(const float dt)
 	R = glm::toMat3(orientation);
 
 	position = centroid - LocalToGlobalVec(localCentroid);
+
+	// damping?
+	/*velocity *= 0.9999f;
+	angularVelocity *= 0.9999f;*/
+
+	if (canSleep)
+	{
+		float lm = glm::dot(velocity, velocity);
+		float am = glm::dot(angularVelocity, angularVelocity);
+		float currMotion = lm + am;
+		const static float bias = 0.98f;
+		motion = bias * motion + (1.0f - bias) * currMotion;
+		if (motion < SLEEP_EPSILON2)
+			SetAwake(false);
+		else if (motion > SLEEP_EPSILON_MAX)
+			motion = SLEEP_EPSILON_MAX;
+
+		if (lm > MAX_VELOCITY2)
+			SetAwake(false);
+	}
 }
 
 void Body::Render()

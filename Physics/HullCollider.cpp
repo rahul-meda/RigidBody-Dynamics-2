@@ -117,6 +117,9 @@ void HullCollider::CalculateMass()
 	glm::vec3 diag(0.0f);
 	glm::vec3 offDiag(0.0f);
 	float volume = 0.0f;
+	centroid = glm::vec3(0.0f);
+	mass = 0.0f;
+	inertia = glm::mat3(0.0f);
 
 	for (int i = 0; i < faces.size(); i++)
 	{

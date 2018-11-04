@@ -155,8 +155,8 @@ void CreateEdgeContact(std::vector<Manifold>& manifolds, HullCollider* A, HullCo
 
 	d = a*e - b*b;
 	//assert(d > 0.0f);
-	if (d <= 0)
-		return;
+	//if (d <= 0)
+		//return;
 
 	s = (b*f - c*e) / d;
 	//assert((s > 0.0f) && (s < 1.0f));

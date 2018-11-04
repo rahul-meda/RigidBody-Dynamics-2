@@ -46,7 +46,8 @@ void FractureTest::OnInit(GLFWwindow* window)
 	bodies.back().AddCollider(collider);
 	colliders.push_back(collider);
 
-	ParseObj("resources/teapot.obj", mesh);
+	ParseObj("resources/teapot_normalized.obj", mesh);
+	mesh.Scale(glm::vec3(3.0f));
 	mesh.GetModelData(model);
 	body.SetModelData(model);
 	body.SetPosition(glm::vec3(0.0, 0.0, 0.0));
@@ -57,9 +58,10 @@ void FractureTest::OnInit(GLFWwindow* window)
 	body.SetTag("teapot");
 	bodies.push_back(body);
 	std::vector<HMesh> meshes;
-	ParseObj("resources/teapot_hulls.obj", meshes, true);
+	ParseObj("resources/teapot_hulls_normalized.obj", meshes, true);
 	for (int i = 0; i < meshes.size(); i++)
 	{
+		meshes[i].Scale(glm::vec3(3.0f));
 		collider = new HullCollider(meshes[i]);
 		bodies.back().AddCollider(collider);
 		colliders.push_back(collider);
@@ -125,7 +127,10 @@ void FractureTest::Update()
 			for (auto c : m.contacts)
 			{
 				if (c.GetBodyA()->GetTag() == "teapot" || c.GetBodyB()->GetTag() == "teapot")
-					shatter = true;
+				{
+					if (c.GetBodyA()->GetMass() != 0 && c.GetBodyB()->GetMass() != 0)
+						shatter = true;
+				}
 			}
 		}
 	}
@@ -159,6 +164,7 @@ void FractureTest::Update()
 			position = b.LocalToGlobalPoint(position);
 			body.SetPosition(position);
 			body.SetOrientation(b.GetOrientation());
+			body.SetTag("teapot");
 			bodies.push_back(body);
 			bodies.back().AddCollider(c);
 		}

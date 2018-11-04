@@ -95,6 +95,33 @@ void CreateSphere(const float radius, ModelData& model)
 	}
 }
 
+void CreateHemiSphere(const float radius, ModelData& model)
+{
+	model.vertices.clear();
+	model.indices.clear();
+	model.frameIndices.clear();
+
+	CreateSphere(radius, model);
+
+	for (int i = 0; i < model.vertices.size() / 2; i++)
+		model.vertices.pop_back();
+
+	for (int i = 0; i < model.indices.size() / 2; i++)
+		model.indices.pop_back();
+}
+
+void CreateLine(const glm::vec3& p1, const glm::vec3& p2, ModelData& model)
+{
+	model.vertices.clear();
+	model.indices.clear();
+	model.frameIndices.clear();
+
+	model.vertices.push_back(p1);
+	model.vertices.push_back(p2);
+	model.indices.push_back(0);
+	model.indices.push_back(1);
+}
+
 glm::mat3 Skew(const glm::vec3& v)
 {
 	return glm::mat3(0, v.z, -v.y,

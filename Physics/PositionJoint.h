@@ -28,6 +28,8 @@ private:
 	glm::vec3 rA;
 	glm::vec3 rB;
 
+	float lambdaSum;
+
 	// Calculates the Jacobian for this joint
 	// @param axis - movement restricted along this world axis
 	// @param anchorA, anchorB - world position of anchors relative to each body
@@ -39,6 +41,14 @@ private:
 
 public:
 	PositionJoint(Body* A, Body* B, const glm::vec3& anchor);
+
+	glm::vec3 GetReactionForce() const;
+
+	glm::vec3 GetAnchorA() const;
+	glm::vec3 GetAnchorB() const;
+
+	Body* GetBodyA() const;
+	Body* GetBodyB() const;
 
 	// Solves this contact by applying impulses
 	void Solve();
