@@ -5,6 +5,7 @@
 #include "HullCollider.h"
 #include "Collider.h"
 #include "SphereCollider.h"
+#include "BroadPhase.h"
 
 CollisionDetectionTest& CollisionDetectionTest::GetInstance()
 {
@@ -44,6 +45,8 @@ void CollisionDetectionTest::OnInit(GLFWwindow* window)
 	collider = new SphereCollider(radius);
 	bodies.back().AddCollider(collider);
 	colliders.push_back(collider);
+
+	BroadPhase::GetInstance().Init(colliders);
 }
 
 void CollisionDetectionTest::OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods)

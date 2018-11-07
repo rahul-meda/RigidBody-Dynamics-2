@@ -3,11 +3,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#define LINE_WIDTH 3.0f
 #define POINT_SIZE 5.0f
 
 Model::Model(const std::vector<glm::vec3>& vertices, const std::vector<int>& indices)
-	: vertices(vertices), indices(indices), primType(GL_TRIANGLES), color(0.4, 0.9, 0.1)
+	: vertices(vertices), indices(indices), primType(GL_TRIANGLES), color(0.4, 0.9, 0.1), lineWidth(3.0f)
 {
 	shader.LoadFromFile(GL_VERTEX_SHADER, "Graphics/shader.vert");
 	shader.LoadFromFile(GL_FRAGMENT_SHADER, "Graphics/shader.frag");
@@ -90,7 +89,7 @@ void Model::Render()
 	if (glm::value_ptr(MVP) != 0)
 		glUniformMatrix4fv(shader.GetUniformLoc("MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
 	glBindVertexArray(vaoID);
-	glLineWidth(LINE_WIDTH);
+	glLineWidth(lineWidth);
 	glPointSize(POINT_SIZE);
 	glDrawElements(primType, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
@@ -103,6 +102,11 @@ void Model::SetColor(const glm::vec3 color)
 	this->color = color;
 	glUniform3fv(shader.GetUniformLoc("vColor"), 1, glm::value_ptr(color));
 	shader.UnUse();
+}
+
+void Model::SetLineWidth(const float width)
+{
+	lineWidth = width;
 }
 
 void Model::SetMVP(const glm::mat4& MVP)

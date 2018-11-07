@@ -5,6 +5,7 @@
 #include "HullCollider.h"
 #include "Collider.h"
 #include "SphereCollider.h"
+#include "BroadPhase.h"
 
 LemonadeMachine& LemonadeMachine::GetInstance()
 {
@@ -570,6 +571,8 @@ void LemonadeMachine::OnInit(GLFWwindow* window)
 	}
 	rj = RevoluteJoint(&bodies[54], &bodies[0], glm::vec3(-5.2, -5.5, -8.8 - 0.3*(float)(N)-0.1 - 1.5), glm::vec3(0, 1.0, 0));
 	revJoints.push_back(rj);
+
+	BroadPhase::GetInstance().Init(colliders);
 }
 
 void LemonadeMachine::OnKeyInput(GLFWwindow* window, int key, int code, int action, int mods)
@@ -686,5 +689,7 @@ void LemonadeMachine::Update()
 		}
 
 		shattered = true;
+
+		BroadPhase::GetInstance().Init(colliders);
 	}
 }

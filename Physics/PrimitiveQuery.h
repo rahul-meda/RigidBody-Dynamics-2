@@ -7,6 +7,7 @@
 class Collider;
 class SphereCollider;
 class HFace;
+struct AABB;
 
 // true if point is inside
 bool QueryPoint(Collider* collider, const glm::vec3& point);
@@ -20,3 +21,6 @@ bool TriangleIsCCW(const glm::vec3& A, const glm::vec3& B, const glm::vec3& C, c
 
 // true if point is inside polygon defined by the vertices
 bool QueryPoint(const glm::vec3& P, const std::vector<glm::vec3>& verts, const glm::vec3& normal);
+
+// true if AABBs overlap
+bool Overlap(AABB* A, AABB* B);

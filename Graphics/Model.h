@@ -22,6 +22,8 @@ public:
 
 	void SetColor(const glm::vec3 color);
 
+	void SetLineWidth(const float width);
+
 	void SetMVP(const glm::mat4& MVP);
 
 	glm::mat4 GetMVP() const;
@@ -43,6 +45,8 @@ private:
 	Shader shader;
 
 	glm::vec3 color;
+
+	float lineWidth;
 
 	glm::mat4 MVP;
 };

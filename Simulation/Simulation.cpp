@@ -12,6 +12,7 @@
 #include "ObjParser.h"
 #include "PrimitiveQuery.h"
 #include "Line.h"
+#include "BroadPhase.h"
 
 #define MOUSE_SENSITIVITY 0.1
 #define FOV 45.0
@@ -227,29 +228,12 @@ void Simulation::Step(const float dt)
 		manifolds[i].contacts.clear();
 	manifolds.clear();
 
-	// To Do : Broadphase
+	BroadPhase::GetInstance().Update();
 
-	for (int iA = 0; iA < colliders.size(); iA++)
-	{
-		for (int iB = iA + 1; iB < colliders.size(); iB++)
-		{
-			if (colliders[iA]->GetBody()->GetGroup() != 0)
-			{
-				if (colliders[iA]->GetBody()->GetGroup() == colliders[iB]->GetBody()->GetGroup())
-					continue;
-			}
+	auto colliderPairs = BroadPhase::GetInstance().ComputePairs();
 
-			if (colliders[iA]->GetBody()->GetInvMass() == 0.0f && colliders[iB]->GetBody()->GetInvMass() == 0.0f)
-				continue;
-
-			if (colliders[iA]->GetShape() == Collider::Sphere && colliders[iB]->GetBody()->GetGroup() == 1)
-				continue;
-			if (colliders[iB]->GetShape() == Collider::Sphere && colliders[iA]->GetBody()->GetGroup() == 1)
-				continue;
-
-			DetectCollision(manifolds, colliders[iA], colliders[iB]);
-		}
-	}
+	for (auto pair : colliderPairs)
+		DetectCollision(manifolds, pair.first, pair.second);
 
 	for (int i = 0; i < VELOCITY_ITERS; i++)
 	{
@@ -312,6 +296,8 @@ void Simulation::Update()
 	{
 		b.Render();
 	}
+
+	BroadPhase::GetInstance().Render();
 
 	for (auto m : manifolds)
 	{

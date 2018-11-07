@@ -95,6 +95,7 @@
     <ClInclude Include="Graphics\Shader.h" />
     <ClInclude Include="Graphics\stb_image.h" />
     <ClInclude Include="Physics\Body.h" />
+    <ClInclude Include="Physics\BroadPhase.h" />
     <ClInclude Include="Physics\Collider.h" />
     <ClInclude Include="Physics\ConstraintCommon.h" />
     <ClInclude Include="Physics\Contact.h" />
@@ -133,6 +134,7 @@
     <ClCompile Include="Graphics\stb_image.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Physics\Body.cpp" />
+    <ClCompile Include="Physics\BroadPhase.cpp" />
     <ClCompile Include="Physics\ConstraintCommon.cpp" />
     <ClCompile Include="Physics\Contact.cpp" />
     <ClCompile Include="Physics\HullCollider.cpp" />

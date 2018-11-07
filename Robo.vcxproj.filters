@@ -126,6 +126,9 @@
     <ClInclude Include="Simulation\Dominoes.h">
       <Filter>Simulation</Filter>
     </ClInclude>
+    <ClInclude Include="Physics\BroadPhase.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
@@ -225,6 +228,9 @@
     </ClCompile>
     <ClCompile Include="Simulation\Dominoes.cpp">
       <Filter>Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\BroadPhase.cpp">
+      <Filter>Physics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

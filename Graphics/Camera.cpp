@@ -1,6 +1,6 @@
 
-#define MAX_SPEED 10.0f
-#define ACCELERATION 5.0f
+#define MAX_SPEED 20.0f
+#define ACCELERATION 7.0f
 #define DAMPING 0.97f
 #define SPEED_EPSILON 0.79f
 
