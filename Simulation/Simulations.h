@@ -15,3 +15,4 @@
 #include "RevoluteJointTest.h"
 #include "LemonadeMachine.h"
 #include "Dominoes.h"
+#include "ClothSimulation.h"

@@ -35,6 +35,47 @@ bool QueryPoint(Collider* collider, const glm::vec3& point)
 	}
 }
 
+void QueryPoint(std::vector<ParticleContact>& contacts, Collider* collider, Particle* particle)
+{
+	switch (collider->GetShape())
+	{
+	case (Collider::Hull) :
+	{
+		glm::vec3 n(0);
+		float d(0);
+		HullCollider* c = static_cast<HullCollider*>(collider);
+		for (int i = 0; i < c->GetFaceCount(); i++)
+		{
+			glm::vec3 P = c->GetFace(i)->edge->tail->position;
+			P = c->GetBody()->LocalToGlobalPoint(P);
+			n = c->GetFace(i)->normal;
+			n = c->GetBody()->LocalToGlobalVec(n);
+			d = glm::dot(P - particle->GetPosition(), n);
+			if (d < -0.07f)
+				return;
+		}
+		contacts.push_back(ParticleContact(particle, n, -d));
+		break;
+	}
+	case (Collider::Sphere) :
+	{
+		SphereCollider* c = static_cast<SphereCollider*>(collider);
+		glm::vec3 C = c->GetBody()->LocalToGlobalPoint(c->GetCentroid());
+		glm::vec3 n = particle->GetPosition() - C;
+		float d = glm::length2(n);
+		if (d < c->GetRadius() * c->GetRadius() * 1.1f)
+		{
+			d = std::sqrtf(d);
+			contacts.push_back(ParticleContact(particle, n/d, c->GetRadius()-d));
+		}
+		break;
+	}
+	default:
+		assert(false);
+		break;
+	}
+}
+
 bool IntersectSegmentSphere(const glm::vec3& A, const glm::vec3& B, SphereCollider* s, glm::vec3& P)
 {
 	glm::vec3 m = A - s->GetBody()->GetPosition();

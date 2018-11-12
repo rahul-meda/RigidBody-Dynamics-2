@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <vector>
+#include "Particle.h"
 
 class Collider;
 class SphereCollider;
@@ -11,6 +12,9 @@ struct AABB;
 
 // true if point is inside
 bool QueryPoint(Collider* collider, const glm::vec3& point);
+
+// creates particle contact if it is inside
+void QueryPoint(std::vector<ParticleContact>& contacts, Collider* collider, Particle* p);
 
 // returns true if segment intersects the sphere 
 // computes P as the midpoiint of the intersected segment

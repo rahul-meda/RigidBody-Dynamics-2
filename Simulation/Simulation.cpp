@@ -60,7 +60,7 @@ void Simulation::OnInit(GLFWwindow* window)
 	ParseObj("resources/cylinder.obj", mesh);
 	mesh.GetModelData(model);
 	cylinder = new Model(model.vertices, model.indices);
-	CreateSphere(1.0, model);
+	CreateSphere(0.03, model);
 	sphere = new Model(model.vertices, model.indices);
 	CreateHemiSphere(1.0, model);
 	hemiSphere = new Model(model.vertices, model.indices);
@@ -304,8 +304,8 @@ void Simulation::Update()
 		for (auto contact : m.contacts)
 		{
 			T = glm::translate(contact.GetPosition());
-			S = glm::scale(glm::vec3(0.03f));
-			M = T * S;
+			//S = glm::scale(glm::vec3(0.03f));
+			M = T;
 			MVP = VP * M;
 			sphere->SetMVP(MVP);
 			sphere->Render();

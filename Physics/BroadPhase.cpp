@@ -53,7 +53,7 @@ void BroadPhase::Init(std::vector<Collider*>& colliders)
 			i = static_cast<HullCollider*>(c)->GetSupport(Z);
 			max.z = static_cast<HullCollider*>(c)->GetVertex(i)->position.z;
 
-			if (c->GetBody()->GetMass() == 0)
+			if (c->GetBody()->GetInvMass() == 0)
 			{
 				glm::vec3 v[8];
 				v[0] = glm::vec3(min.x, min.y, min.z);
@@ -100,7 +100,7 @@ void BroadPhase::Init(std::vector<Collider*>& colliders)
 	std::vector<AABB*> aabbsDynamic;
 	for (AABB* aabb : aabbs)
 	{
-		if (aabb->collider->GetBody()->GetMass() == 0)
+		if (aabb->collider->GetBody()->GetInvMass() == 0)
 			aabbsStatic.push_back(aabb);
 		else
 			aabbsDynamic.push_back(aabb);

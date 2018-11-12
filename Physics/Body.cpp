@@ -373,7 +373,7 @@ void Body::Update(const float dt)
 	invInertia = glm::transpose(R) * localInvInertia * R;
 
 	velocity += invMass * forceSum * dt;
-	velocity += GRAVITY * (glm::vec3(0, -1, 0)) * dt;
+	velocity += GRAVITY * (glm::vec3(0, -1.0, 0)) * dt;
 	angularVelocity += invInertia * torqueSum * dt;
 
 	/*glm::vec3 dw1 = invInertia * torqueSum * dt;

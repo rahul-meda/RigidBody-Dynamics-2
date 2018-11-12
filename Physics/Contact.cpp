@@ -108,7 +108,7 @@ void Manifold::SolveVelocities()
 	Body* A = contacts[0].A;
 	Body* B = contacts[0].B;
 
-	if (A->GetMass() != 0 && B->GetMass() != 0)
+	if (A->GetInvMass() != 0 && B->GetInvMass() != 0)
 	{
 		if (A->IsAwake() ^ B->IsAwake())
 		{

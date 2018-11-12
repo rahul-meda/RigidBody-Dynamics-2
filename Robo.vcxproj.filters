@@ -129,6 +129,15 @@
     <ClInclude Include="Physics\BroadPhase.h">
       <Filter>Physics</Filter>
     </ClInclude>
+    <ClInclude Include="Physics\Particle.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Spring.h">
+      <Filter>Physics\Constraints</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation\ClothSimulation.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
@@ -231,6 +240,15 @@
     </ClCompile>
     <ClCompile Include="Physics\BroadPhase.cpp">
       <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Particle.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Spring.cpp">
+      <Filter>Physics\Constraints</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation\ClothSimulation.cpp">
+      <Filter>Simulation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

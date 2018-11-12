@@ -128,7 +128,7 @@ void FractureTest::Update()
 			{
 				if (c.GetBodyA()->GetGroup() == 1 || c.GetBodyB()->GetGroup() == 1)
 				{
-					if (c.GetBodyA()->GetMass() != 0 && c.GetBodyB()->GetMass() != 0)
+					if (c.GetBodyA()->GetInvMass() != 0 && c.GetBodyB()->GetInvMass() != 0)
 						shatter = true;
 				}
 			}
